@@ -1,174 +1,143 @@
-import { cadastrarCliente } from "@/app/actions/cadastro-actions"
-import { Header } from "@/components/header"
+"use client"
 
-export default function CadastroPage() {
+import { useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Eye, EyeOff } from "lucide-react"
+
+export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false)
+  const [formData, setFormData] = useState({
+    email: "",
+    senha: ""
+  })
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    
+    try {
+      // Aqui você implementará a lógica de autenticação real
+      // Por agora, vamos simular um login bem-sucedido
+      console.log("Login:", formData)
+      
+      // Simular delay de autenticação
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Redirecionar para o menu após login bem-sucedido
+      router.push('/menu')
+    } catch (error) {
+      console.error('Erro no login:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
   return (
-    <div className="min-h-screen bg-amber-50">
-      <Header />
+    <div className="min-h-screen bg-amber-50 flex items-center justify-center px-4">
+      <div className="max-w-md w-full space-y-8">
+        {/* Logo/Header */}
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-amber-900 mb-2">🍕</h1>
+          <h2 className="text-2xl font-bold text-amber-900">Bem-vindo!</h2>
+          <p className="text-amber-700 mt-2">Entre na sua conta para fazer pedidos</p>
+        </div>
 
-      <div className="px-4 py-6">
-        <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-md p-6">
-          <h1 className="text-3xl font-bold text-amber-900 mb-6">Abrir Conta</h1>
-          {/* @ts-expect-error Server Action */}
-          <form action={cadastrarCliente} className="space-y-6">
-            {/* Dados pessoais */}
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-amber-800">Dados Pessoais</h2>
-
-              <div>
-                <label className="block text-sm font-medium text-amber-900 mb-1">Nome Completo *</label>
-                <input
-                  name="nome"
-                  type="text"
-                  required
-                  className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-amber-900 mb-1">CPF *</label>
-                  <input
-                    name="cpf"
-                    type="text"
-                    required
-                    placeholder="000.000.000-00"
-                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-amber-900 mb-1">Telefone</label>
-                  <input
-                    name="telefone"
-                    type="tel"
-                    placeholder="(11) 99999-9999"
-                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
-                  />
-                </div>
-              </div>
+        {/* Form */}
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-amber-900 mb-2">
+                E-mail
+              </label>
+              <Input
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl"
+                placeholder="seu@email.com"
+              />
             </div>
 
-            {/* Dados de acesso */}
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-amber-800">Dados de Acesso</h2>
-
-              <div>
-                <label className="block text-sm font-medium text-amber-900 mb-1">E-mail *</label>
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-amber-900 mb-1">Senha *</label>
-                <input
+            <div>
+              <label className="block text-sm font-medium text-amber-900 mb-2">
+                Senha
+              </label>
+              <div className="relative">
+                <Input
                   name="senha"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
-                  minLength={6}
-                  className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
+                  value={formData.senha}
+                  onChange={handleInputChange}
+                  className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl pr-12"
+                  placeholder="Digite sua senha"
                 />
-                <p className="text-xs text-amber-600 mt-1">Mínimo 6 caracteres</p>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-600 hover:text-amber-800"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
               </div>
             </div>
 
-            {/* Endereço */}
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-amber-800">Endereço de Entrega</h2>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-amber-900 mb-1">Rua *</label>
-                  <input
-                    name="rua"
-                    type="text"
-                    required
-                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-amber-900 mb-1">Número *</label>
-                  <input
-                    name="numero"
-                    type="text"
-                    required
-                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-amber-900 mb-1">Complemento</label>
-                <input
-                  name="complemento"
-                  type="text"
-                  placeholder="Apto, bloco, etc"
-                  className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-amber-900 mb-1">Bairro *</label>
-                  <input
-                    name="bairro"
-                    type="text"
-                    required
-                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-amber-900 mb-1">CEP *</label>
-                  <input
-                    name="cep"
-                    type="text"
-                    required
-                    placeholder="00000-000"
-                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-amber-900 mb-1">Cidade *</label>
-                  <input
-                    name="cidade"
-                    type="text"
-                    required
-                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-amber-900 mb-1">Estado *</label>
-                  <select
-                    name="estado"
-                    required
-                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
-                  >
-                    <option value="">Selecione</option>
-                    <option value="SP">São Paulo</option>
-                    <option value="RJ">Rio de Janeiro</option>
-                    <option value="MG">Minas Gerais</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <button
+            <Button
               type="submit"
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-4 rounded-2xl transition-colors"
+              disabled={isLoading}
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-amber-900 font-bold py-4 rounded-xl text-lg disabled:opacity-50"
             >
-              Criar Conta
-            </button>
+              {isLoading ? "Entrando..." : "Entrar"}
+            </Button>
           </form>
+
+          {/* Divider */}
+          <div className="mt-6 flex items-center justify-center">
+            <div className="border-t border-amber-200 flex-1"></div>
+            <span className="px-4 text-sm text-amber-600">ou</span>
+            <div className="border-t border-amber-200 flex-1"></div>
+          </div>
+
+          {/* Sign up link */}
+          <div className="mt-6 text-center">
+            <p className="text-amber-700">
+              Não tem uma conta?{" "}
+              <Link
+                href="/cadastro"
+                className="font-semibold text-amber-900 hover:text-yellow-600 underline"
+              >
+                Criar conta
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* Guest access link */}
+        <div className="text-center">
+          <Link
+            href="/menu"
+            className="text-amber-700 hover:text-amber-900 underline"
+          >
+            Continuar sem login →
+          </Link>
         </div>
       </div>
     </div>

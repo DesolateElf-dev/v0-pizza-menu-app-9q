@@ -10,7 +10,19 @@ import { cadastrarCliente } from '@/app/actions/cadastro-actions'
 export default function CadastroPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const totalSteps = 3
+
+  const handleSubmit = async (formData: FormData) => {
+    setIsSubmitting(true)
+    try {
+      await cadastrarCliente(formData)
+    } catch (error) {
+      console.error('Erro no cadastro:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-amber-50 py-8 px-4">
@@ -48,8 +60,7 @@ export default function CadastroPage() {
 
         {/* Form */}
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          {/* @ts-expect-error Server Action */}
-          <form action={cadastrarCliente} className="space-y-6">
+          <form action={handleSubmit} className="space-y-6">
             {/* Step 1: Dados pessoais */}
             {currentStep === 1 && (
               <div className="space-y-6">
@@ -272,7 +283,7 @@ export default function CadastroPage() {
                 </Button>
               ) : (
                 <Link
-                  href="/login"
+                  href="/"
                   className="bg-amber-200 hover:bg-amber-300 text-amber-900 font-semibold py-3 px-6 rounded-xl inline-flex items-center"
                 >
                   Já tem conta? Entrar
@@ -290,9 +301,10 @@ export default function CadastroPage() {
               ) : (
                 <Button
                   type="submit"
-                  className="bg-yellow-500 hover:bg-yellow-600 text-amber-900 font-bold py-3 px-6 rounded-xl"
+                  disabled={isSubmitting}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-amber-900 font-bold py-3 px-6 rounded-xl disabled:opacity-50"
                 >
-                  Criar Conta
+                  {isSubmitting ? "Criando..." : "Criar Conta"}
                 </Button>
               )}
             </div>
@@ -302,7 +314,7 @@ export default function CadastroPage() {
         {/* Back to menu link */}
         <div className="text-center mt-6">
           <Link
-            href="/"
+            href="/menu"
             className="text-amber-700 hover:text-amber-900 underline"
           >
             ← Voltar ao cardápio

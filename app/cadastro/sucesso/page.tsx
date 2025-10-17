@@ -43,7 +43,7 @@ export default function SucessoPage() {
         
         {/* Action Buttons */}
         <div className="space-y-4">
-          <Link href="/" className="block">
+          <Link href="/menu" className="block">
             <Button className="w-full bg-yellow-500 hover:bg-yellow-600 text-amber-900 font-bold py-4 rounded-xl text-lg group">
               Explorar Cardápio
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -51,7 +51,7 @@ export default function SucessoPage() {
           </Link>
           
           <Link 
-            href="/login" 
+            href="/" 
             className="block text-amber-700 hover:text-amber-900 underline font-medium"
           >
             Fazer Login
