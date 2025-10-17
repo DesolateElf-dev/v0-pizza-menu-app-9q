@@ -1,4 +1,4 @@
-import { cadastrarCliente } from '@/app/actions/cadastro-action'
+import { cadastrarCliente } from '@/app/actions/cadastro-actions'
 
 export default function CadastroPage() {
   return (
