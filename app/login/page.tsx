@@ -1,82 +1,124 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Header } from "@/components/header"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Eye, EyeOff } from "lucide-react"
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [senha, setSenha] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [formData, setFormData] = useState({
+    email: "",
+    senha: ""
+  })
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    // Aqui você implementará a lógica de login
+    console.log("Login:", formData)
+  }
 
-    // Mock login - in a real app, this would validate against a backend
-    if (email && senha) {
-      // Store user data (in a real app, this would come from the backend)
-      localStorage.setItem("userName", email.split("@")[0])
-      localStorage.setItem("userEmail", email)
-
-      // Redirect to menu/cardapio
-      router.push("/cardapio")
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
   }
 
   return (
-    <div className="min-h-screen bg-amber-50">
-      <Header />
+    <div className="min-h-screen bg-amber-50 flex items-center justify-center px-4">
+      <div className="max-w-md w-full space-y-8">
+        {/* Logo/Header */}
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-amber-900 mb-2">🍕</h1>
+          <h2 className="text-2xl font-bold text-amber-900">Bem-vindo de volta!</h2>
+          <p className="text-amber-700 mt-2">Entre na sua conta para fazer pedidos</p>
+        </div>
 
-      <div className="px-4 py-12">
-        <div className="max-w-md mx-auto bg-white rounded-2xl shadow-md p-8">
-          <h1 className="text-3xl font-bold text-amber-900 mb-2">Bem-vindo!</h1>
-          <p className="text-amber-700 mb-6">Entre com sua conta para fazer pedidos</p>
-
-          <form onSubmit={handleLogin} className="space-y-4">
+        {/* Form */}
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-amber-900 mb-1">E-mail</label>
-              <input
+              <label className="block text-sm font-medium text-amber-900 mb-2">
+                E-mail
+              </label>
+              <Input
+                name="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl"
                 placeholder="seu@email.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-amber-900 mb-1">Senha</label>
-              <input
-                type="password"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                required
-                minLength={6}
-                className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
-                placeholder="••••••"
-              />
+              <label className="block text-sm font-medium text-amber-900 mb-2">
+                Senha
+              </label>
+              <div className="relative">
+                <Input
+                  name="senha"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={formData.senha}
+                  onChange={handleInputChange}
+                  className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl pr-12"
+                  placeholder="Digite sua senha"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-600 hover:text-amber-800"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
-            <button
+            <Button
               type="submit"
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-4 rounded-2xl transition-colors"
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-amber-900 font-bold py-4 rounded-xl text-lg"
             >
               Entrar
-            </button>
+            </Button>
           </form>
 
+          {/* Divider */}
+          <div className="mt-6 flex items-center justify-center">
+            <div className="border-t border-amber-200 flex-1"></div>
+            <span className="px-4 text-sm text-amber-600">ou</span>
+            <div className="border-t border-amber-200 flex-1"></div>
+          </div>
+
+          {/* Sign up link */}
           <div className="mt-6 text-center">
-            <p className="text-amber-700 text-sm">
+            <p className="text-amber-700">
               Não tem uma conta?{" "}
-              <Link href="/" className="text-amber-900 font-semibold hover:underline">
+              <Link
+                href="/cadastro"
+                className="font-semibold text-amber-900 hover:text-yellow-600 underline"
+              >
                 Criar conta
               </Link>
             </p>
           </div>
+        </div>
+
+        {/* Back to menu link */}
+        <div className="text-center">
+          <Link
+            href="/"
+            className="text-amber-700 hover:text-amber-900 underline"
+          >
+            ← Voltar ao cardápio
+          </Link>
         </div>
       </div>
     </div>
