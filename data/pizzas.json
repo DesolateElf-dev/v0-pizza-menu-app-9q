@@ -1,0 +1,38 @@
+[
+  {
+    "id": "calabresa",
+    "nome": "CALABRESA",
+    "descricao": "Mussarela, Calabresa e Cebola.",
+    "precoGrande": 50.0,
+    "precoMedia": 40.0,
+    "imagem": "/placeholder.svg?height=200&width=200",
+    "categoria": "PIZZAS"
+  },
+  {
+    "id": "morango",
+    "nome": "MORANGO",
+    "descricao": "Mussarela, Calabresa e Cebola.",
+    "precoGrande": 50.0,
+    "precoMedia": 40.0,
+    "imagem": "/placeholder.svg?height=200&width=200",
+    "categoria": "DOCES"
+  },
+  {
+    "id": "margherita",
+    "nome": "MARGHERITA",
+    "descricao": "Mussarela, Tomate e Manjericão.",
+    "precoGrande": 45.0,
+    "precoMedia": 35.0,
+    "imagem": "/placeholder.svg?height=200&width=200",
+    "categoria": "PIZZAS"
+  },
+  {
+    "id": "portuguesa",
+    "nome": "PORTUGUESA",
+    "descricao": "Mussarela, Presunto, Ovos e Cebola.",
+    "precoGrande": 55.0,
+    "precoMedia": 45.0,
+    "imagem": "/placeholder.svg?height=200&width=200",
+    "categoria": "PIZZAS"
+  }
+]
