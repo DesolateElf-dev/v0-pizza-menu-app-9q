@@ -13,7 +13,7 @@ export function Header({ showBackButton }: HeaderProps) {
   const router = useRouter()
   const pathname = usePathname()
 
-  const isHomePage = pathname === "/"
+  const isHomePage = pathname === "/" || pathname === "/login"
 
   return (
     <header className="bg-red-600 text-white px-4 py-4 flex items-center justify-between">
@@ -30,13 +30,15 @@ export function Header({ showBackButton }: HeaderProps) {
         <h1 className="text-xl font-bold">Pizzaria Mackenzie</h1>
       </div>
 
-      <Link href="/menu">
-        <Avatar className="w-10 h-10 bg-white cursor-pointer hover:bg-gray-100 transition-colors">
-          <AvatarFallback className="bg-amber-800 text-white">
-            <User className="w-6 h-6" />
-          </AvatarFallback>
-        </Avatar>
-      </Link>
+      {!isHomePage && (
+        <Link href="/menu">
+          <Avatar className="w-10 h-10 bg-white cursor-pointer hover:bg-gray-100 transition-colors">
+            <AvatarFallback className="bg-amber-800 text-white">
+              <User className="w-6 h-6" />
+            </AvatarFallback>
+          </Avatar>
+        </Link>
+      )}
     </header>
   )
 }

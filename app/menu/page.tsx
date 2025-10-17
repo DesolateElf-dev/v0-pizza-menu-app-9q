@@ -6,18 +6,27 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 const menuItems = [
-  { icon: Home, label: "Iniciar", href: "/" },
+  { icon: Home, label: "Cardápio", href: "/cardapio" },
   { icon: FileText, label: "Meus Pedidos", href: "/pedidos" },
   { icon: History, label: "Historico de pedidos", href: "/historico" },
   { icon: Heart, label: "Favoritos", href: "/favoritos" },
   { icon: Search, label: "Rastreio pedido", href: "/rastreio" },
   { icon: HelpCircle, label: "Suporte", href: "/suporte" },
   { icon: Settings, label: "Configurações", href: "/configuracoes" },
-  { icon: LogOut, label: "Sair", href: "/sair" },
 ]
 
 export default function MenuPage() {
   const router = useRouter()
+
+  const userName = typeof window !== "undefined" ? localStorage.getItem("userName") || "Usuário" : "Usuário"
+
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("userName")
+      localStorage.removeItem("userEmail")
+    }
+    router.push("/login")
+  }
 
   return (
     <div className="min-h-screen bg-red-600 text-white">
@@ -38,7 +47,7 @@ export default function MenuPage() {
         </Avatar>
         <div>
           <p className="text-white/80 text-sm">Olá,</p>
-          <p className="text-white font-bold text-lg">Jotta</p>
+          <p className="text-white font-bold text-lg">{userName}</p>
         </div>
       </div>
 
@@ -57,6 +66,14 @@ export default function MenuPage() {
             </Link>
           )
         })}
+
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-4 px-4 py-4 hover:bg-red-700 rounded-lg transition-colors"
+        >
+          <LogOut className="w-6 h-6" />
+          <span className="font-medium">Sair</span>
+        </button>
       </div>
     </div>
   )

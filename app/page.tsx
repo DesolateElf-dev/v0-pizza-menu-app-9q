@@ -1,160 +1,175 @@
-"use client"
-
-import { useState, useMemo } from "react"
-import { Search } from "lucide-react"
+import { cadastrarCliente } from "@/app/actions/cadastro-actions"
 import { Header } from "@/components/header"
-import { PizzaCard } from "@/components/pizza-card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useCart } from "@/context/cart-context"
-import type { Product, TabType } from "@/types"
-import Link from "next/link"
 
-// Mock data - in a real app, this would come from an API
-const pizzas: Product[] = [
-  {
-    id: "calabresa",
-    nome: "CALABRESA",
-    descricao: "Mussarela, Calabresa e Cebola.",
-    precoGrande: 50.0,
-    precoMedia: 40.0,
-    imagem: "/calabresa-pizza-with-pepperoni-and-cheese.jpg",
-    categoria: "PIZZAS",
-  },
-  {
-    id: "margherita",
-    nome: "MARGHERITA",
-    descricao: "Mussarela, Tomate e Manjericão.",
-    precoGrande: 45.0,
-    precoMedia: 35.0,
-    imagem: "/margherita-pizza-with-tomato-and-basil.jpg",
-    categoria: "PIZZAS",
-  },
-  {
-    id: "portuguesa",
-    nome: "PORTUGUESA",
-    descricao: "Mussarela, Presunto, Ovos e Cebola.",
-    precoGrande: 55.0,
-    precoMedia: 45.0,
-    imagem: "/portuguese-pizza.png",
-    categoria: "PIZZAS",
-  },
-]
-
-const doces: Product[] = [
-  {
-    id: "morango",
-    nome: "MORANGO",
-    descricao: "Mussarela, Calabresa e Cebola.",
-    precoGrande: 50.0,
-    precoMedia: 40.0,
-    imagem: "/strawberry-dessert-pizza-with-chocolate.jpg",
-    categoria: "DOCES",
-  },
-  {
-    id: "chocolate",
-    nome: "CHOCOLATE",
-    descricao: "Chocolate ao Leite e Granulado.",
-    precoGrande: 48.0,
-    precoMedia: 38.0,
-    imagem: "/chocolate-dessert-pizza.png",
-    categoria: "DOCES",
-  },
-]
-
-const bebidas: Product[] = [
-  {
-    id: "coca-cola",
-    nome: "REFRIGERANTE",
-    descricao: "COCA-COLA.",
-    precoGrande: 15.0,
-    precoMedia: 10.0,
-    imagem: "/classic-coca-cola.png",
-    categoria: "BEBIDAS",
-    tamanhos: {
-      "1 litros": 10.0,
-      "2 litros": 15.0,
-    },
-  },
-  {
-    id: "guarana",
-    nome: "GUARANÁ",
-    descricao: "GUARANÁ ANTARCTICA.",
-    precoGrande: 15.0,
-    precoMedia: 10.0,
-    imagem: "/guarana-soda-bottle.jpg",
-    categoria: "BEBIDAS",
-    tamanhos: {
-      "1 litros": 10.0,
-      "2 litros": 15.0,
-    },
-  },
-]
-
-const allProducts = [...pizzas, ...doces, ...bebidas]
-
-export default function HomePage() {
-  const [activeTab, setActiveTab] = useState<TabType>("PIZZAS")
-  const [searchQuery, setSearchQuery] = useState("")
-  const { total, items } = useCart()
-
-  const filteredProducts = useMemo(() => {
-    return allProducts.filter((product) => {
-      const matchesTab = product.categoria === activeTab
-      const matchesSearch = product.nome.toLowerCase().includes(searchQuery.toLowerCase())
-      return matchesTab && matchesSearch
-    })
-  }, [activeTab, searchQuery])
-
-  const tabs: TabType[] = ["PIZZAS", "DOCES", "BEBIDAS"]
-
+export default function CadastroPage() {
   return (
     <div className="min-h-screen bg-amber-50">
       <Header />
 
-      <div className="px-4 py-4 space-y-4">
-        {/* Search Bar */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-600 w-5 h-5" />
-          <Input
-            type="text"
-            placeholder="buscar..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-amber-200 border-none rounded-2xl text-amber-800 placeholder:text-amber-600"
-          />
-        </div>
+      <div className="px-4 py-6">
+        <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-md p-6">
+          <h1 className="text-3xl font-bold text-amber-900 mb-6">Abrir Conta</h1>
+          {/* @ts-expect-error Server Action */}
+          <form action={cadastrarCliente} className="space-y-6">
+            {/* Dados pessoais */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-amber-800">Dados Pessoais</h2>
 
-        {/* Tabs */}
-        <div className="flex justify-center space-x-8">
-          {tabs.map((tab) => (
+              <div>
+                <label className="block text-sm font-medium text-amber-900 mb-1">Nome Completo *</label>
+                <input
+                  name="nome"
+                  type="text"
+                  required
+                  className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-amber-900 mb-1">CPF *</label>
+                  <input
+                    name="cpf"
+                    type="text"
+                    required
+                    placeholder="000.000.000-00"
+                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-amber-900 mb-1">Telefone</label>
+                  <input
+                    name="telefone"
+                    type="tel"
+                    placeholder="(11) 99999-9999"
+                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Dados de acesso */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-amber-800">Dados de Acesso</h2>
+
+              <div>
+                <label className="block text-sm font-medium text-amber-900 mb-1">E-mail *</label>
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-amber-900 mb-1">Senha *</label>
+                <input
+                  name="senha"
+                  type="password"
+                  required
+                  minLength={6}
+                  className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
+                />
+                <p className="text-xs text-amber-600 mt-1">Mínimo 6 caracteres</p>
+              </div>
+            </div>
+
+            {/* Endereço */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-amber-800">Endereço de Entrega</h2>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-amber-900 mb-1">Rua *</label>
+                  <input
+                    name="rua"
+                    type="text"
+                    required
+                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-amber-900 mb-1">Número *</label>
+                  <input
+                    name="numero"
+                    type="text"
+                    required
+                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-amber-900 mb-1">Complemento</label>
+                <input
+                  name="complemento"
+                  type="text"
+                  placeholder="Apto, bloco, etc"
+                  className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-amber-900 mb-1">Bairro *</label>
+                  <input
+                    name="bairro"
+                    type="text"
+                    required
+                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-amber-900 mb-1">CEP *</label>
+                  <input
+                    name="cep"
+                    type="text"
+                    required
+                    placeholder="00000-000"
+                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-amber-900 mb-1">Cidade *</label>
+                  <input
+                    name="cidade"
+                    type="text"
+                    required
+                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-amber-900 mb-1">Estado *</label>
+                  <select
+                    name="estado"
+                    required
+                    className="w-full px-4 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-50"
+                  >
+                    <option value="">Selecione</option>
+                    <option value="SP">São Paulo</option>
+                    <option value="RJ">Rio de Janeiro</option>
+                    <option value="MG">Minas Gerais</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`text-sm font-semibold pb-2 ${
-                activeTab === tab ? "text-amber-900 border-b-2 border-amber-900" : "text-amber-600"
-              }`}
+              type="submit"
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-4 rounded-2xl transition-colors"
             >
-              {tab}
+              Criar Conta
             </button>
-          ))}
+          </form>
         </div>
-
-        {/* Products Grid */}
-        <div className="grid grid-cols-2 gap-4 pb-24">
-          {filteredProducts.map((product) => (
-            <PizzaCard key={product.id} product={product} />
-          ))}
-        </div>
-      </div>
-
-      {/* Fixed Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-amber-50">
-        <Link href="/carrinho">
-          <Button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 rounded-2xl text-lg">
-            Ver pedidos {items.length > 0 && `(${items.length})`}
-          </Button>
-        </Link>
       </div>
     </div>
   )
