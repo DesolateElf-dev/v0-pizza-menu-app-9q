@@ -20,7 +20,7 @@ export default function CarrinhoPage() {
           <h2 className="text-xl font-bold text-amber-900 mb-4">Pedidos:</h2>
           <p className="text-amber-700 mb-8">Seu carrinho está vazio</p>
 
-          <Link href="/">
+          <Link href="/menu">
             <Button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-3 rounded-2xl">
               Ver cardápio
             </Button>

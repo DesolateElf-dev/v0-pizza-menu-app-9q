@@ -93,7 +93,7 @@ const bebidas: Product[] = [
 
 const allProducts = [...pizzas, ...doces, ...bebidas]
 
-export default function MenuPage() {
+export default function CardapioPage() {
   const [activeTab, setActiveTab] = useState<TabType>("PIZZAS")
   const [searchQuery, setSearchQuery] = useState("")
   const { total, items } = useCart()

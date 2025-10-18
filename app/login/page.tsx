@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Eye, EyeOff } from "lucide-react"
@@ -13,28 +12,11 @@ export default function LoginPage() {
     email: "",
     senha: ""
   })
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-    
-    try {
-      // Aqui você implementará a lógica de autenticação real
-      // Por agora, vamos simular um login bem-sucedido
-      console.log("Login:", formData)
-      
-      // Simular delay de autenticação
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Redirecionar para o menu após login bem-sucedido
-      router.push('/menu')
-    } catch (error) {
-      console.error('Erro no login:', error)
-    } finally {
-      setIsLoading(false)
-    }
+    // Aqui você implementará a lógica de login
+    console.log("Login:", formData)
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,7 +32,7 @@ export default function LoginPage() {
         {/* Logo/Header */}
         <div className="text-center">
           <h1 className="text-4xl font-bold text-amber-900 mb-2">🍕</h1>
-          <h2 className="text-2xl font-bold text-amber-900">Bem-vindo!</h2>
+          <h2 className="text-2xl font-bold text-amber-900">Bem-vindo de volta!</h2>
           <p className="text-amber-700 mt-2">Entre na sua conta para fazer pedidos</p>
         </div>
 
@@ -102,10 +84,9 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-amber-900 font-bold py-4 rounded-xl text-lg disabled:opacity-50"
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-amber-900 font-bold py-4 rounded-xl text-lg"
             >
-              {isLoading ? "Entrando..." : "Entrar"}
+              Entrar
             </Button>
           </form>
 
@@ -130,13 +111,13 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Guest access link */}
+        {/* Back to menu link */}
         <div className="text-center">
           <Link
-            href="/menu"
+            href="/"
             className="text-amber-700 hover:text-amber-900 underline"
           >
-            Continuar sem login →
+            ← Voltar ao cardápio
           </Link>
         </div>
       </div>
