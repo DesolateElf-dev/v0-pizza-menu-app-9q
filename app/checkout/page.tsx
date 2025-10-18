@@ -62,7 +62,8 @@ export default function CheckoutPage() {
 
   const handleSuccessClose = () => {
     setShowSuccess(false)
-    router.push("/")
+    // ALTERAÇÃO: Redireciona para o menu em vez da página inicial
+    router.push("/menu")
   }
 
   return (
