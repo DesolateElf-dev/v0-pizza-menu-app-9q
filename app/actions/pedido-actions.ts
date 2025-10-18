@@ -1,32 +1,64 @@
 'use server'
 
 import { prisma } from '@/lib/db'
+import { Decimal } from '@prisma/client/runtime/library'
 
-export async function getPizzas() {
+export async function criarPedido(usuarioId: string, itens: any[], valorTotal: number) {
   try {
-    const pizzas = await prisma.pizza.findMany({
-      orderBy: {
-        sabor: 'asc'
+    const pedido = await prisma.pedido.create({
+      data: {
+        usuarioId,
+        valorTotal: new Decimal(valorTotal.toFixed(2)),
+        status: 'Recebido',
+        itens: {
+          create: itens.map(item => ({
+            pizzaId: item.id,
+            quantidade: item.quantidade || 1,
+            tamanho: 'Média'
+          }))
+        }
+      },
+      include: {
+        itens: {
+          include: {
+            pizza: true
+          }
+        }
       }
     })
 
-    console.log(`Carregadas ${pizzas.length} pizzas do banco`)
-    return pizzas
+    console.log('Pedido criado:', pedido.id)
+    return pedido
   } catch (error) {
-    console.error('Erro ao carregar pizzas:', error)
-    return []
+    console.error('Erro ao criar pedido:', error)
+    throw error
   }
 }
 
-export async function getPizzaById(id: string) {
+export async function getPedidosByUsuario(usuarioId: string) {
   try {
-    const pizza = await prisma.pizza.findUnique({
-      where: { id }
+    const pedidos = await prisma.pedido.findMany({
+      where: {
+        usuarioId,
+        status: {
+          in: ['Recebido', 'Em preparo', 'Saiu para entrega']
+        }
+      },
+      include: {
+        itens: {
+          include: {
+            pizza: true
+          }
+        }
+      },
+      orderBy: {
+        dataPedido: 'desc'
+      }
     })
 
-    return pizza
+    return pedidos
   } catch (error) {
-    console.error('Erro ao buscar pizza:', error)
-    return null
+    console.error('Erro ao buscar pedidos:', error)
+    return []
   }
 }

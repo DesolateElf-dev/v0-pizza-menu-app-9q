@@ -48,17 +48,31 @@ export default function CheckoutPage() {
     return digits
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault()
 
-    // Generate random order number
-    const orderNum = Math.floor(1000 + Math.random() * 9000).toString()
-    setOrderNumber(orderNum)
+  // Generate random order number
+  const orderNum = Math.floor(1000 + Math.random() * 9000).toString()
+  setOrderNumber(orderNum)
+  
+  // TODO: Aqui você integraria com o sistema de pagamento real
+  // Por agora, vamos simular sucesso e salvar o pedido
+  
+  try {
+    // Simular processamento do pagamento
+    console.log('Processando pagamento...', formData)
+    
+    // TODO: Implementar criação do pedido
+    // const pedido = await criarPedido(usuarioId, items, total)
+    
     setShowSuccess(true)
-
-    // Clear cart after successful order
-    clear()
+    clear() // Limpar carrinho após sucesso
+  } catch (error) {
+    console.error('Erro no checkout:', error)
+    // Aqui você mostraria uma mensagem de erro
   }
+}
+
 
   const handleSuccessClose = () => {
     setShowSuccess(false)
