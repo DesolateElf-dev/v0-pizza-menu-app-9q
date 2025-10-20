@@ -13,9 +13,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useCart } from "@/context/cart-context"
 import { formatPrice } from "@/lib/price"
 import { useRouter } from "next/navigation"
+import { criarPedido } from "@/app/actions/pedido-actions"
 
 export default function CheckoutPage() {
-  const { total, clear } = useCart()
+  const { items, total, clear } = useCart()
   const router = useRouter()
   const [showSuccess, setShowSuccess] = useState(false)
   const [orderNumber, setOrderNumber] = useState("")
@@ -48,31 +49,44 @@ export default function CheckoutPage() {
     return digits
   }
 
-const handleSubmit = (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault()
 
-  // Generate random order number
-  const orderNum = Math.floor(1000 + Math.random() * 9000).toString()
-  setOrderNumber(orderNum)
-  
-  // TODO: Aqui você integraria com o sistema de pagamento real
-  // Por agora, vamos simular sucesso e salvar o pedido
-  
   try {
-    // Simular processamento do pagamento
-    console.log('Processando pagamento...', formData)
+    console.log('Processando pedido...')
     
-    // TODO: Implementar criação do pedido
-    // const pedido = await criarPedido(usuarioId, items, total)
+    // TODO: ID do usuário logado (temporariamente fixo)
+    // Depois vamos integrar com a sessão do login
+    const usuarioEmail = "maria.santos@email.com" // Use um email que existe no banco
+
+    // Mapear itens do carrinho para o formato do banco
+    const itensPedido = items.map((item) => ({
+      id: item.id,                  // pizzaId (string cuid da pizza)
+      quantidade: item.quantidade   // quantidade do item
+    }))
+
+    console.log('Itens do pedido:', itensPedido)
+    console.log('Valor total:', total)
+
+    // Criar pedido no banco de dados
+    const pedidoCriado = await criarPedido(usuarioEmail, itensPedido, total)
     
+    // Número de pedido para mostrar ao usuário
+    const orderNum = pedidoCriado.id.slice(0, 6).toUpperCase()
+    setOrderNumber(orderNum)
+
+    console.log('✅ Pedido criado com sucesso:', pedidoCriado.id)
+
+    // Limpar carrinho e mostrar popup de sucesso
+    clear()
     setShowSuccess(true)
-    clear() // Limpar carrinho após sucesso
+
   } catch (error) {
-    console.error('Erro no checkout:', error)
-    // Aqui você mostraria uma mensagem de erro
+    console.error('❌ Erro ao processar pedido:', error)
+    // TODO: Mostrar mensagem de erro para o usuário
+    alert('Erro ao processar pedido. Tente novamente.')
   }
 }
-
 
   const handleSuccessClose = () => {
     setShowSuccess(false)

@@ -3,7 +3,6 @@
 import type React from "react"
 import { createContext, useContext, useReducer, useEffect } from "react"
 import type { CartItem, Product } from "@/types"
-import { calcSubtotal } from "@/lib/price"
 
 interface CartState {
   items: CartItem[]
@@ -11,14 +10,14 @@ interface CartState {
 }
 
 interface CartContextType extends CartState {
-  addItem: (product: Product, tipo?: "GRANDE" | "MÉDIA" | "1 litros" | "2 litros") => void
+  addItem: (product: Product) => void
   removeItem: (id: string) => void
   updateQty: (id: string, quantidade: number) => void
   clear: () => void
 }
 
 type CartAction =
-  | { type: "ADD_ITEM"; payload: { product: Product; tipo: "GRANDE" | "MÉDIA" | "1 litros" | "2 litros" } }
+  | { type: "ADD_ITEM"; payload: Product }
   | { type: "REMOVE_ITEM"; payload: string }
   | { type: "UPDATE_QTY"; payload: { id: string; quantidade: number } }
   | { type: "CLEAR" }
@@ -29,38 +28,34 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case "ADD_ITEM": {
-      const { product, tipo } = action.payload
-      const precoUnit =
-        tipo === "GRANDE"
-          ? product.precoGrande
-          : tipo === "MÉDIA"
-            ? product.precoMedia
-            : product.tamanhos?.[tipo] || product.precoMedia
-
-      const itemId = `${product.id}-${tipo}`
+      const product = action.payload
+      
+      // Usar apenas o ID original da pizza (sem concatenar nada)
+      const itemId = product.id
       const existingItem = state.items.find((item) => item.id === itemId)
 
       let newItems: CartItem[]
 
       if (existingItem) {
+        // Se o item já existe, incrementar quantidade
         newItems = state.items.map((item) =>
           item.id === itemId
             ? {
                 ...item,
                 quantidade: item.quantidade + 1,
-                subtotal: calcSubtotal(item.precoUnit, item.quantidade + 1),
+                subtotal: item.precoUnit * (item.quantidade + 1),
               }
             : item,
         )
       } else {
+        // Criar novo item (preço único - usar precoMedia)
         const newItem: CartItem = {
           id: itemId,
-          tipo,
           nome: product.nome,
           imagem: product.imagem,
-          precoUnit,
+          precoUnit: product.precoMedia, // Preço único
           quantidade: 1,
-          subtotal: precoUnit,
+          subtotal: product.precoMedia,
         }
         newItems = [...state.items, newItem]
       }
@@ -89,7 +84,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           ? {
               ...item,
               quantidade,
-              subtotal: calcSubtotal(item.precoUnit, quantidade),
+              subtotal: item.precoUnit * quantidade,
             }
           : item,
       )
@@ -134,8 +129,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("pizzaria-cart", JSON.stringify(state.items))
   }, [state.items])
 
-  const addItem = (product: Product, tipo: "GRANDE" | "MÉDIA" | "1 litros" | "2 litros" = "MÉDIA") => {
-    dispatch({ type: "ADD_ITEM", payload: { product, tipo } })
+  const addItem = (product: Product) => {
+    dispatch({ type: "ADD_ITEM", payload: product })
   }
 
   const removeItem = (id: string) => {

@@ -9,17 +9,16 @@ import { Input } from "@/components/ui/input"
 import { useCart } from "@/context/cart-context"
 import Link from "next/link"
 // COMENTAR TEMPORARIAMENTE:
-// import { getPizzas } from "@/app/actions/pizza-actions"
+import { getPizzas } from "@/app/actions/pizza-actions"
 
-// Tipos mantidos iguais...
-type Product = {
+// Tipo para Pizza do banco (após conversão)
+type PizzaDB = {
   id: string
-  nome: string
-  descricao: string
-  precoGrande: number
-  precoMedia: number
-  imagem: string
-  categoria: string
+  sabor: string
+  descricao: string | null
+  precoBase: number  // ← Agora é number, não Decimal
+  imagem: string | null
+  criadoEm: Date
 }
 
 export default function MenuPage() {
@@ -29,78 +28,51 @@ export default function MenuPage() {
   const [error, setError] = useState("")
   const { total, items } = useCart()
 
-  // DADOS TEMPORÁRIOS - Carregar pizzas mockadas
-  useEffect(() => {
-    async function loadPizzas() {
-      try {
-        setLoading(true)
-        setError("")
-        
-        // Simular delay de carregamento
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        
-        // DADOS MOCKADOS
-        const pizzasTemp = [
-          {
-            id: 'pizza1',
-            nome: 'Margherita',
-            descricao: 'Molho de tomate, mussarela e manjericão fresco',
-            precoMedia: 35.00,
-            precoGrande: 35.00,
-            imagem: '/images/pizzas/default.jpg',
-            categoria: 'PIZZAS'
-          },
-          {
-            id: 'pizza2',
-            nome: 'Calabresa',
-            descricao: 'Molho de tomate, mussarela, calabresa e cebola',
-            precoMedia: 38.00,
-            precoGrande: 38.00,
-            imagem: '/images/pizzas/default.jpg',
-            categoria: 'PIZZAS'
-          },
-          {
-            id: 'pizza3',
-            nome: 'Portuguesa',
-            descricao: 'Molho de tomate, mussarela, presunto, ovos e cebola',
-            precoMedia: 42.00,
-            precoGrande: 42.00,
-            imagem: '/images/pizzas/default.jpg',
-            categoria: 'PIZZAS'
-          },
-          {
-            id: 'pizza4',
-            nome: 'Quatro Queijos',
-            descricao: 'Mussarela, parmesão, gorgonzola e provolone',
-            precoMedia: 45.00,
-            precoGrande: 45.00,
-            imagem: '/images/pizzas/default.jpg',
-            categoria: 'PIZZAS'
-          },
-          {
-            id: 'pizza5',
-            nome: 'Pepperoni',
-            descricao: 'Molho de tomate, mussarela e pepperoni',
-            precoMedia: 40.00,
-            precoGrande: 40.00,
-            imagem: '/images/pizzas/default.jpg',
-            categoria: 'PIZZAS'
-          }
-        ]
-        
-        setProducts(pizzasTemp)
-        console.log(`${pizzasTemp.length} pizzas carregadas (dados temporários)`)
-        
-      } catch (error) {
-        console.error('Erro ao carregar produtos:', error)
-        setError("Erro ao carregar o cardápio. Tente novamente.")
-      } finally {
-        setLoading(false)
+// Carregar pizzas do banco de dados
+useEffect(() => {
+  async function loadPizzas() {
+    try {
+      setLoading(true)
+      setError("")
+      
+      // CARREGAR PIZZAS REAIS DO BANCO
+      const pizzasDB = await getPizzas()
+      
+      if (pizzasDB.length === 0) {
+        setError("Nenhuma pizza encontrada no cardápio. Adicione pizzas pelo Prisma Studio.")
+        return
       }
-    }
+      
+      console.log('Pizzas do banco:', pizzasDB)
+      
+      // Converter para o formato esperado pelo componente
+      const productsConverted: Product[] = pizzasDB.map((pizza: PizzaDB) => ({
+        id: pizza.id,          // ID real do banco (cuid)
+        nome: pizza.sabor,     // Campo 'sabor' da tabela
+        descricao: pizza.descricao || 'Deliciosa pizza artesanal',
+        precoMedia: pizza.precoBase,    // Já é number agora
+        precoGrande: pizza.precoBase,   // Mesmo preço
+        imagem: pizza.imagem 
+          ? `/images/pizzas/${pizza.imagem}` 
+          : '/images/pizzas/default.jpg',
+        categoria: 'PIZZAS'
+      }))
 
-    loadPizzas()
-  }, [])
+      
+      setProducts(productsConverted)
+      console.log(`✅ ${productsConverted.length} pizzas carregadas do banco`)
+      
+    } catch (error) {
+      console.error('❌ Erro ao carregar produtos:', error)
+      setError("Erro ao carregar o cardápio. Verifique a conexão com o banco.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  loadPizzas()
+}, [])
+
 
   // Resto do código permanece igual...
   const filteredProducts = useMemo(() => {
