@@ -3,6 +3,7 @@
 import { ArrowLeft, User, LogOut, Clock } from "lucide-react"
 import { useRouter, usePathname } from "next/navigation"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { getCurrentSession } from "@/app/actions/session-actions"
 import { logout } from "@/app/actions/logout-actions"
 import Link from "next/link"
@@ -57,6 +58,7 @@ export function Header({ showBackButton }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-2">
+        {/* No desktop podemos manter o atalho de pedidos; no mobile o dropdown cuida */}
         <Link href="/pedidos" title="Meus pedidos" className="mr-1 hidden sm:inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-red-700 hover:bg-red-800">
           <Clock className="w-4 h-4" />
           <span className="text-sm font-medium">Pedidos</span>
@@ -64,34 +66,33 @@ export function Header({ showBackButton }: HeaderProps) {
 
         {isLoading ? (
           <div className="w-10 h-10 bg-red-700 rounded-full animate-pulse"></div>
-        ) : session ? (
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium hidden sm:block">Olá, {session.nome.split(' ')[0]}</span>
-            <div className="flex gap-1">
-              <Link href="/perfil" title="Meu Perfil">
-                <Avatar className="w-10 h-10 bg-amber-600 cursor-pointer hover:bg-amber-700 transition-colors">
-                  <AvatarFallback className="bg-amber-600 text-white">
-                    <User className="w-5 h-5" />
-                  </AvatarFallback>
-                </Avatar>
-              </Link>
-              <button onClick={handleLogout} title="Sair" className="p-1 hover:bg-red-700 rounded-full transition-colors">
-                <Avatar className="w-10 h-10 bg-red-700 cursor-pointer hover:bg-red-800 transition-colors">
-                  <AvatarFallback className="bg-red-700 text-white">
-                    <LogOut className="w-5 h-5" />
-                  </AvatarFallback>
-                </Avatar>
-              </button>
-            </div>
-          </div>
         ) : (
-          <Link href="/" title="Fazer Login">
-            <Avatar className="w-10 h-10 bg-amber-600 cursor-pointer hover:bg-amber-700 transition-colors">
-              <AvatarFallback className="bg-amber-600 text-white">
-                <User className="w-5 h-5" />
-              </AvatarFallback>
-            </Avatar>
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar className="w-10 h-10 bg-amber-600 cursor-pointer hover:bg-amber-700 transition-colors">
+                <AvatarFallback className="bg-amber-600 text-white">
+                  <User className="w-5 h-5" />
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-48">
+              {session ? (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href="/pedidos">📋 Meus pedidos</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/perfil">👤 Meu perfil</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>🚪 Sair</DropdownMenuItem>
+                </>
+              ) : (
+                <DropdownMenuItem asChild>
+                  <Link href="/">Entrar</Link>
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
     </header>
