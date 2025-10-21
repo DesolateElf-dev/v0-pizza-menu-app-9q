@@ -7,6 +7,7 @@ const SESSION_COOKIE_NAME = 'pizzaria-session'
 const protectedPaths = [
   '/checkout',
   '/perfil',
+  '/pedidos',
 ]
 
 export function middleware(req: NextRequest) {
@@ -27,5 +28,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/checkout/:path*', '/perfil/:path*'],
+  matcher: ['/checkout/:path*', '/perfil/:path*', '/pedidos/:path*'],
 }
