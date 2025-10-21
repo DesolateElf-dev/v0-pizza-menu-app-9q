@@ -15,13 +15,7 @@ export function PizzaCard({ product }: PizzaCardProps) {
   const { addItem } = useCart()
 
   const handleAddToCart = () => {
-    if (product.categoria === "BEBIDAS") {
-      // For drinks, default to 1 litro
-      addItem(product, "1 litros")
-    } else {
-      // For pizzas and desserts, default to MÉDIA
-      addItem(product, "MÉDIA")
-    }
+    addItem(product) // Apenas isso, sem parâmetros de tamanho
   }
 
   return (
