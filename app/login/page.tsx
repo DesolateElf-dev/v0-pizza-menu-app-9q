@@ -103,7 +103,7 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center">
-          <Link href="/" className="text-amber-700 hover:text-amber-900 underline">← Voltar ao cardápio</Link>
+          <Link href="/menu" className="text-amber-700 hover:text-amber-900 underline">← Voltar ao cardápio</Link>
         </div>
       </div>
     </div>
