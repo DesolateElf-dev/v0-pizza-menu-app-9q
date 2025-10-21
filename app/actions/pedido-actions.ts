@@ -3,7 +3,14 @@
 import { prisma } from '@/lib/db'
 import { Decimal } from '@prisma/client/runtime/library'
 
-export async function criarPedido(usuarioEmail: string, itens: any[], valorTotal: number) {
+// Tipo para item do carrinho com discriminador
+interface ItemCarrinho {
+  id: string
+  type: 'pizza' | 'pizzaDoce' | 'bebida'
+  quantidade: number
+}
+
+export async function criarPedido(usuarioEmail: string, itens: ItemCarrinho[], valorTotal: number) {
   try {
     // Buscar usuário pelo email
     const usuario = await prisma.usuario.findUnique({
@@ -15,6 +22,33 @@ export async function criarPedido(usuarioEmail: string, itens: any[], valorTotal
     }
 
     console.log('✅ Criando pedido para:', usuario.nome)
+    console.log('📦 Itens do carrinho:', itens)
+
+    // Criar itens polimórficos baseados no tipo
+    const itensParaCriar = itens.map(item => {
+      const itemData: any = {
+        quantidade: item.quantidade || 1
+      }
+      
+      // Preencher apenas o campo correto baseado no tipo
+      switch (item.type) {
+        case 'pizza':
+          itemData.pizzaId = item.id
+          break
+        case 'pizzaDoce':
+          itemData.pizzaDoceId = item.id
+          break
+        case 'bebida':
+          itemData.bebidaId = item.id
+          break
+        default:
+          throw new Error(`Tipo de item inválido: ${item.type}`)
+      }
+      
+      return itemData
+    })
+
+    console.log('🔧 Itens para criar no banco:', itensParaCriar)
 
     const pedido = await prisma.pedido.create({
       data: {
@@ -22,17 +56,15 @@ export async function criarPedido(usuarioEmail: string, itens: any[], valorTotal
         valorTotal: new Decimal(valorTotal.toFixed(2)),
         status: 'Recebido',
         itens: {
-          create: itens.map(item => ({
-            pizzaId: item.id,
-            quantidade: item.quantidade || 1,
-            tamanho: 'Média'
-          }))
+          create: itensParaCriar
         }
       },
       include: {
         itens: {
           include: {
-            pizza: true
+            pizza: true,
+            pizzaDoce: true,
+            bebida: true
           }
         }
       }
@@ -46,10 +78,18 @@ export async function criarPedido(usuarioEmail: string, itens: any[], valorTotal
       valorTotal: parseFloat(pedido.valorTotal.toString()),
       itens: pedido.itens.map(item => ({
         ...item,
-        pizza: {
+        pizza: item.pizza ? {
           ...item.pizza,
           precoBase: parseFloat(item.pizza.precoBase.toString())
-        }
+        } : null,
+        pizzaDoce: item.pizzaDoce ? {
+          ...item.pizzaDoce,
+          precoBase: parseFloat(item.pizzaDoce.precoBase.toString())
+        } : null,
+        bebida: item.bebida ? {
+          ...item.bebida,
+          preco: parseFloat(item.bebida.preco.toString())
+        } : null
       }))
     }
 
@@ -73,7 +113,9 @@ export async function getPedidosByUsuario(usuarioId: string) {
       include: {
         itens: {
           include: {
-            pizza: true
+            pizza: true,
+            pizzaDoce: true,
+            bebida: true
           }
         }
       },
@@ -85,13 +127,21 @@ export async function getPedidosByUsuario(usuarioId: string) {
     // Converter Decimals para numbers
     const pedidosConvertidos = pedidos.map(pedido => ({
       ...pedido,
-      valorTotal: parseFloat(pedido.valorTotal.toString()),
+      valorTotal: parseFloat(pedido.valorTotal?.toString() || '0'),
       itens: pedido.itens.map(item => ({
         ...item,
-        pizza: {
+        pizza: item.pizza ? {
           ...item.pizza,
           precoBase: parseFloat(item.pizza.precoBase.toString())
-        }
+        } : null,
+        pizzaDoce: item.pizzaDoce ? {
+          ...item.pizzaDoce,
+          precoBase: parseFloat(item.pizzaDoce.precoBase.toString())
+        } : null,
+        bebida: item.bebida ? {
+          ...item.bebida,
+          preco: parseFloat(item.bebida.preco.toString())
+        } : null
       }))
     }))
 
@@ -100,4 +150,20 @@ export async function getPedidosByUsuario(usuarioId: string) {
     console.error('Erro ao buscar pedidos:', error)
     return []
   }
+}
+
+// Função auxiliar para obter o nome do item baseado no tipo
+export function getItemName(item: any): string {
+  if (item.pizza) return item.pizza.sabor
+  if (item.pizzaDoce) return item.pizzaDoce.sabor
+  if (item.bebida) return item.bebida.nome
+  return 'Item desconhecido'
+}
+
+// Função auxiliar para obter o preço do item baseado no tipo
+export function getItemPrice(item: any): number {
+  if (item.pizza) return item.pizza.precoBase
+  if (item.pizzaDoce) return item.pizzaDoce.precoBase
+  if (item.bebida) return item.bebida.preco
+  return 0
 }
