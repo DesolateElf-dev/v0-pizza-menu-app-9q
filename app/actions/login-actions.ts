@@ -6,11 +6,14 @@ import { redirect } from 'next/navigation'
 import { createSession } from '@/lib/auth'
 
 export async function authenticateUser(formData: FormData) {
+  
   try {
     const emailRaw = formData.get('email')
     const senhaRaw = formData.get('senha')
 
     const email = typeof emailRaw === 'string' ? emailRaw.toLowerCase().trim() : ''
+    console.log('🔍 Iniciando autenticação:', { email })
+
     const senha = typeof senhaRaw === 'string' ? senhaRaw : ''
 
     if (!email || !senha) {
@@ -20,6 +23,8 @@ export async function authenticateUser(formData: FormData) {
     const usuario = await prisma.usuario.findUnique({
       where: { email },
     })
+
+    console.log('👤 Usuário encontrado:', !!usuario)
 
     if (!usuario || !usuario.senha) {
       throw new Error('Email ou senha incorretos')
