@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 export function Sheet({ children }: { children: React.ReactNode }) {
-  return <div>{children}</div>
+  return <div className="relative z-[100]">{children}</div>
 }
 
 export function SheetTrigger({ asChild, children, onClick }: { asChild?: boolean; children: React.ReactElement; onClick?: () => void }) {
@@ -18,13 +18,13 @@ export function SheetContent({ children, side = 'right', open, onClose }: { chil
   return (
     <>
       <div
-        className={`fixed inset-0 bg-black/40 transition-opacity ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 bg-black/40 transition-opacity ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} z-[120]`}
         onClick={onClose}
       />
       <aside
         className={`fixed top-0 ${side === 'right' ? 'right-0' : 'left-0'} h-full w-80 max-w-[85%] bg-white text-amber-900 shadow-xl transform transition-transform ${
           open ? 'translate-x-0' : side === 'right' ? 'translate-x-full' : '-translate-x-full'
-        }`}
+        } z-[130]`}
         role="dialog"
         aria-modal="true"
       >
