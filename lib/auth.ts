@@ -10,7 +10,7 @@ export interface UserSession {
 }
 
 export async function createSession(usuario: UserSession) {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   cookieStore.set(SESSION_COOKIE_NAME, JSON.stringify(usuario), {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -22,14 +22,14 @@ export async function createSession(usuario: UserSession) {
 }
 
 export async function getSession(): Promise<UserSession | null> {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const c = cookieStore.get(SESSION_COOKIE_NAME)
   if (!c?.value) return null
   return JSON.parse(c.value) as UserSession
 }
 
 export async function destroySession() {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   cookieStore.delete(SESSION_COOKIE_NAME)
   return true
 }
