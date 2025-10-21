@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 datasource db {
   provider  = "postgresql"
   url       = env("POSTGRES_URL")
@@ -13,16 +10,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// Tabela de usuários/clientes
 model Usuario {
   id          String   @id @default(cuid())
   nome        String
   cpf         String   @unique
   email       String?  @unique
-  senha       String?  // hash bcrypt, opcional se quiser permitir pedidos sem cadastro
+  senha       String?
   telefone    String?
-  
-  // Endereço completo
   rua         String?
   numero      String?
   complemento String?
@@ -30,61 +24,74 @@ model Usuario {
   cidade      String?
   estado      String?
   cep         String?
-  
   criadoEm    DateTime @default(now()) @map("criado_em")
-  
-  // Relação: um usuário pode ter vários pedidos
   pedidos     Pedido[]
 
   @@map("usuarios")
 }
 
-// Tabela de pizzas do cardápio
 model Pizza {
   id          String   @id @default(cuid())
   sabor       String   @unique
   descricao   String?
   precoBase   Decimal  @map("preco_base") @db.Decimal(10, 2)
-  imagem      String?  // ← ADICIONE ESTA LINHA
-  
+  imagem      String?
   criadoEm    DateTime @default(now()) @map("criado_em")
-  
   itensPedido ItemPedido[]
 
   @@map("pizzas")
 }
 
+model PizzaDoce {
+  id          String   @id @default(cuid())
+  sabor       String   @unique
+  descricao   String?
+  precoBase   Decimal  @map("preco_base") @db.Decimal(10, 2)
+  imagem      String?
+  criadoEm    DateTime @default(now()) @map("criado_em")
+  itensPedido ItemPedido[]
 
-// Tabela de pedidos
+  @@map("pizzas_doces")
+}
+
+model Bebida {
+  id        String   @id @default(cuid())
+  nome      String
+  volume    String? // ex: 350ml, 1L
+  preco     Decimal  @db.Decimal(10, 2)
+  imagem    String?
+  criadoEm  DateTime @default(now()) @map("criado_em")
+  itensPedido ItemPedido[]
+
+  @@map("bebidas")
+}
+
 model Pedido {
   id          String   @id @default(cuid())
   usuarioId   String   @map("usuario_id")
   dataPedido  DateTime @default(now()) @map("data_pedido")
   status      String   @default("Recebido")
   valorTotal  Decimal? @map("valor_total") @db.Decimal(10, 2)
-  
-  // Relação: cada pedido pertence a um usuário
   usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  
-  // Relação: um pedido pode ter vários itens
   itens       ItemPedido[]
 
   @@map("pedidos")
 }
 
-// Tabela de itens dentro de cada pedido
 model ItemPedido {
-  id         String  @id @default(cuid())
-  pedidoId   String  @map("pedido_id")
-  pizzaId    String  @map("pizza_id")
-  tamanho    String  // "Pequena", "Média", "Grande"
-  quantidade Int
-  
-  // Relação: cada item pertence a um pedido
-  pedido     Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
-  
-  // Relação: cada item referencia uma pizza do cardápio
-  pizza      Pizza   @relation(fields: [pizzaId], references: [id], onDelete: Restrict)
+  id           String  @id @default(cuid())
+  pedidoId     String  @map("pedido_id")
+  // Referências opcionais para permitir 1 tipo por item
+  pizzaId      String? @map("pizza_id")
+  pizzaDoceId  String? @map("pizza_doce_id")
+  bebidaId     String? @map("bebida_id")
+
+  quantidade   Int
+
+  pedido       Pedido    @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  pizza        Pizza?     @relation(fields: [pizzaId], references: [id], onDelete: Restrict)
+  pizzaDoce    PizzaDoce? @relation(fields: [pizzaDoceId], references: [id], onDelete: Restrict)
+  bebida       Bebida?    @relation(fields: [bebidaId], references: [id], onDelete: Restrict)
 
   @@map("itens_pedido")
 }
