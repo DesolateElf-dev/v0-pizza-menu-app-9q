@@ -41,7 +41,7 @@ export default function CadastroPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-amber-900 mb-2">CPF *</nlabel>
+                  <label className="block text-sm font-medium text-amber-900 mb-2">CPF *</label>
                   <Input name="cpf" type="text" required placeholder="000.000.000-00" className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl" />
                 </div>
                 <div>
