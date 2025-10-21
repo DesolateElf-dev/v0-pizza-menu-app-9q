@@ -1,12 +1,41 @@
 "use client"
 
-import { useActionState, useEffect } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Eye, EyeOff, User, Mail, MapPin } from 'lucide-react'
+import { User, Mail, MapPin } from 'lucide-react'
 import { registerUser, type RegisterResult } from '@/app/actions/register-actions'
+
+const onlyDigits = (s: string) => s.replace(/\D/g, '')
+const maskCPF = (v: string) => {
+  const d = onlyDigits(v).slice(0, 11)
+  if (d.length <= 3) return d
+  if (d.length <= 6) return d.replace(/(\d{3})(\d{0,3})/, '$1.$2')
+  if (d.length <= 9) return d.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3')
+  return d.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4')
+}
+const maskTelefone = (v: string) => {
+  const d = onlyDigits(v).slice(0, 11)
+  if (d.length <= 10) {
+    return d
+      .replace(/^(\d{0,2})/, '($1')
+      .replace(/^(\(\d{2})(\d{0,4})/, '$1) $2')
+      .replace(/(\d{4})(\d{1,4})$/, '$1-$2')
+      .trim()
+  }
+  return d
+    .replace(/^(\d{0,2})/, '($1')
+    .replace(/^(\(\d{2})(\d{0,5})/, '$1) $2')
+    .replace(/(\d{5})(\d{1,4})$/, '$1-$2')
+    .trim()
+}
+const maskCEP = (v: string) => {
+  const d = onlyDigits(v).slice(0, 8)
+  if (d.length <= 5) return d
+  return d.replace(/(\d{5})(\d{0,3})/, '$1-$2')
+}
 
 export default function CadastroPage() {
   const router = useRouter()
@@ -16,6 +45,11 @@ export default function CadastroPage() {
   }, null as RegisterResult | null)
 
   const ok = state?.ok === true
+
+  // estados controlados com máscara
+  const [cpf, setCpf] = useState('')
+  const [telefone, setTelefone] = useState('')
+  const [cep, setCep] = useState('')
 
   // Redirecionar para login com mensagem de sucesso
   useEffect(() => {
@@ -53,11 +87,11 @@ export default function CadastroPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-amber-900 mb-2">CPF *</label>
-                  <Input name="cpf" type="text" required placeholder="000.000.000-00" className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl" />
+                  <Input name="cpf" type="text" required placeholder="000.000.000-00" value={cpf} onChange={(e) => setCpf(maskCPF(e.target.value))} className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-amber-900 mb-2">Telefone</label>
-                  <Input name="telefone" type="tel" placeholder="(11) 99999-9999" className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl" />
+                  <Input name="telefone" type="tel" placeholder="(11) 99999-9999" value={telefone} onChange={(e) => setTelefone(maskTelefone(e.target.value))} className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl" />
                 </div>
               </div>
             </div>
@@ -111,7 +145,7 @@ export default function CadastroPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-amber-900 mb-2">CEP *</label>
-                  <Input name="cep" type="text" required placeholder="00000-000" className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl" />
+                  <Input name="cep" type="text" required placeholder="00000-000" value={cep} onChange={(e) => setCep(maskCEP(e.target.value))} className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl" />
                 </div>
               </div>
 
