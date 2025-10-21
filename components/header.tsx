@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft, User, LogOut } from "lucide-react"
+import { ArrowLeft, User, LogOut, Clock } from "lucide-react"
 import { useRouter, usePathname } from "next/navigation"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { getCurrentSession } from "@/app/actions/session-actions"
@@ -21,27 +21,24 @@ export function Header({ showBackButton }: HeaderProps) {
 
   const isMenuPage = pathname === "/menu"
 
-  // Buscar sessão ao carregar o componente
   useEffect(() => {
     async function loadSession() {
       try {
         const userSession = await getCurrentSession()
         setSession(userSession)
       } catch (error) {
-        console.error('Erro ao carregar sessão:', error)
         setSession(null)
       } finally {
         setIsLoading(false)
       }
     }
     loadSession()
-  }, [pathname]) // Re-carregar quando mudar de página
+  }, [pathname])
 
   const handleLogout = async () => {
     try {
       await logout()
     } catch (error) {
-      console.error('Erro no logout:', error)
       router.push('/')
     }
   }
@@ -50,11 +47,7 @@ export function Header({ showBackButton }: HeaderProps) {
     <header className="bg-red-600 text-white px-4 py-4 flex items-center justify-between">
       <div className="flex items-center gap-3">
         {(showBackButton || !isMenuPage) && (
-          <button
-            onClick={() => router.back()}
-            className="p-1 hover:bg-red-700 rounded-full transition-colors"
-            aria-label="Voltar"
-          >
+          <button onClick={() => router.back()} className="p-1 hover:bg-red-700 rounded-full transition-colors" aria-label="Voltar">
             <ArrowLeft className="w-6 h-6" />
           </button>
         )}
@@ -64,10 +57,14 @@ export function Header({ showBackButton }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-2">
+        <Link href="/pedidos" title="Meus pedidos" className="mr-1 hidden sm:inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-red-700 hover:bg-red-800">
+          <Clock className="w-4 h-4" />
+          <span className="text-sm font-medium">Pedidos</span>
+        </Link>
+
         {isLoading ? (
           <div className="w-10 h-10 bg-red-700 rounded-full animate-pulse"></div>
         ) : session ? (
-          /* Usuário logado */
           <div className="flex items-center gap-3">
             <span className="text-sm font-medium hidden sm:block">Olá, {session.nome.split(' ')[0]}</span>
             <div className="flex gap-1">
@@ -88,7 +85,6 @@ export function Header({ showBackButton }: HeaderProps) {
             </div>
           </div>
         ) : (
-          /* Usuário não logado */
           <Link href="/" title="Fazer Login">
             <Avatar className="w-10 h-10 bg-amber-600 cursor-pointer hover:bg-amber-700 transition-colors">
               <AvatarFallback className="bg-amber-600 text-white">
