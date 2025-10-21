@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,10 +9,22 @@ import { Eye, EyeOff } from "lucide-react"
 import { authenticateUser } from "@/app/actions/login-actions"
 
 export default function LoginPage() {
+  const searchParams = useSearchParams()
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({ email: "", senha: "" })
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+
+  // Mostrar mensagem de sucesso se veio do cadastro
+  useEffect(() => {
+    if (searchParams.get('success') === 'account-created') {
+      setSuccessMessage('Conta criada com sucesso! Faça login para continuar.')
+      // Remover mensagem após 5s
+      const timer = setTimeout(() => setSuccessMessage(null), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,6 +54,13 @@ export default function LoginPage() {
           <h2 className="text-2xl font-bold text-amber-900">Bem-vindo de volta!</h2>
           <p className="text-amber-700 mt-2">Entre na sua conta para fazer pedidos</p>
         </div>
+
+        {/* Success message from cadastro */}
+        {successMessage && (
+          <div className="bg-green-100 border border-green-300 text-green-700 p-4 rounded-xl">
+            <p className="font-medium">✓ {successMessage}</p>
+          </div>
+        )}
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -103,7 +123,7 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center">
-          <Link href="/" className="text-amber-700 hover:text-amber-900 underline">← Voltar ao cardápio</Link>
+          <Link href="/menu" className="text-amber-700 hover:text-amber-900 underline">← Voltar ao cardápio</Link>
         </div>
       </div>
     </div>

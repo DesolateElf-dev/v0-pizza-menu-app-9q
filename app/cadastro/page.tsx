@@ -1,20 +1,65 @@
 "use client"
 
-import { useActionState } from 'react'
+import { useActionState, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Eye, EyeOff, User, Mail, Phone, MapPin } from 'lucide-react'
+import { User, Mail, MapPin } from 'lucide-react'
 import { registerUser, type RegisterResult } from '@/app/actions/register-actions'
 
+const onlyDigits = (s: string) => s.replace(/\D/g, '')
+const maskCPF = (v: string) => {
+  const d = onlyDigits(v).slice(0, 11)
+  if (d.length <= 3) return d
+  if (d.length <= 6) return d.replace(/(\d{3})(\d{0,3})/, '$1.$2')
+  if (d.length <= 9) return d.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3')
+  return d.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4')
+}
+const maskTelefone = (v: string) => {
+  const d = onlyDigits(v).slice(0, 11)
+  if (d.length <= 10) {
+    return d
+      .replace(/^(\d{0,2})/, '($1')
+      .replace(/^(\(\d{2})(\d{0,4})/, '$1) $2')
+      .replace(/(\d{4})(\d{1,4})$/, '$1-$2')
+      .trim()
+  }
+  return d
+    .replace(/^(\d{0,2})/, '($1')
+    .replace(/^(\(\d{2})(\d{0,5})/, '$1) $2')
+    .replace(/(\d{5})(\d{1,4})$/, '$1-$2')
+    .trim()
+}
+const maskCEP = (v: string) => {
+  const d = onlyDigits(v).slice(0, 8)
+  if (d.length <= 5) return d
+  return d.replace(/(\d{5})(\d{0,3})/, '$1-$2')
+}
+
 export default function CadastroPage() {
-  const totalSteps = 3
+  const router = useRouter()
   const [state, formAction, isPending] = useActionState(async (_prev: RegisterResult | null, formData: FormData) => {
     const res = await registerUser(formData)
     return res
   }, null as RegisterResult | null)
 
   const ok = state?.ok === true
+
+  // estados controlados com máscara
+  const [cpf, setCpf] = useState('')
+  const [telefone, setTelefone] = useState('')
+  const [cep, setCep] = useState('')
+
+  // Redirecionar para login com mensagem de sucesso
+  useEffect(() => {
+    if (ok) {
+      const timer = setTimeout(() => {
+        router.push('/login?success=account-created')
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [ok, router])
 
   return (
     <div className="min-h-screen bg-amber-50 py-8 px-4">
@@ -27,7 +72,7 @@ export default function CadastroPage() {
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <form action={formAction} className="space-y-6">
-            {/* Passo 1 */}
+            {/* Dados Pessoais */}
             <div className="space-y-6">
               <div className="flex items-center space-x-2 mb-4">
                 <User className="w-5 h-5 text-amber-600" />
@@ -42,16 +87,16 @@ export default function CadastroPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-amber-900 mb-2">CPF *</label>
-                  <Input name="cpf" type="text" required placeholder="000.000.000-00" className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl" />
+                  <Input name="cpf" type="text" required placeholder="000.000.000-00" value={cpf} onChange={(e) => setCpf(maskCPF(e.target.value))} className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-amber-900 mb-2">Telefone</label>
-                  <Input name="telefone" type="tel" placeholder="(11) 99999-9999" className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl" />
+                  <Input name="telefone" type="tel" placeholder="(11) 99999-9999" value={telefone} onChange={(e) => setTelefone(maskTelefone(e.target.value))} className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl" />
                 </div>
               </div>
             </div>
 
-            {/* Passo 2 */}
+            {/* Dados de Acesso */}
             <div className="space-y-6">
               <div className="flex items-center space-x-2 mb-4">
                 <Mail className="w-5 h-5 text-amber-600" />
@@ -70,7 +115,7 @@ export default function CadastroPage() {
               </div>
             </div>
 
-            {/* Passo 3 */}
+            {/* Endereço de Entrega */}
             <div className="space-y-6">
               <div className="flex items-center space-x-2 mb-4">
                 <MapPin className="w-5 h-5 text-amber-600" />
@@ -100,7 +145,7 @@ export default function CadastroPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-amber-900 mb-2">CEP *</label>
-                  <Input name="cep" type="text" required placeholder="00000-000" className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl" />
+                  <Input name="cep" type="text" required placeholder="00000-000" value={cep} onChange={(e) => setCep(maskCEP(e.target.value))} className="w-full bg-amber-50 border-amber-200 focus:border-amber-400 focus:ring-amber-400 rounded-xl" />
                 </div>
               </div>
 
@@ -121,14 +166,33 @@ export default function CadastroPage() {
               </div>
             </div>
 
+            {/* Feedback Messages */}
             {state?.message && (
-              <p className={ok ? 'text-green-700' : 'text-red-600'}>{state.message}</p>
+              <div className={`p-4 rounded-xl ${
+                ok 
+                  ? 'bg-green-100 border border-green-300 text-green-700' 
+                  : 'bg-red-100 border border-red-300 text-red-700'
+              }`}>
+                <p className="font-medium">
+                  {ok ? '✓ ' : '⚠ '}
+                  {state.message}
+                </p>
+                {ok && (
+                  <p className="text-sm mt-1">Redirecionando para o login...</p>
+                )}
+              </div>
             )}
 
             <div className="flex justify-between pt-6">
-              <Link href="/" className="bg-amber-200 hover:bg-amber-300 text-amber-900 font-semibold py-3 px-6 rounded-xl inline-flex items-center">Já tem conta? Entrar</Link>
-              <Button type="submit" disabled={isPending} className="bg-yellow-500 hover:bg-yellow-600 text-amber-900 font-bold py-3 px-6 rounded-xl disabled:opacity-50">
-                {isPending ? 'Criando...' : (ok ? 'Conta criada!' : 'Criar Conta')}
+              <Link href="/" className="bg-amber-200 hover:bg-amber-300 text-amber-900 font-semibold py-3 px-6 rounded-xl inline-flex items-center">
+                Já tem conta? Entrar
+              </Link>
+              <Button 
+                type="submit" 
+                disabled={isPending || ok} 
+                className="bg-yellow-500 hover:bg-yellow-600 text-amber-900 font-bold py-3 px-6 rounded-xl disabled:opacity-50"
+              >
+                {isPending ? 'Criando...' : ok ? 'Conta criada! ✓' : 'Criar Conta'}
               </Button>
             </div>
           </form>
