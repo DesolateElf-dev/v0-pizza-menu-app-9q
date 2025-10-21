@@ -1,20 +1,31 @@
 "use client"
 
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Eye, EyeOff, User, Mail, Phone, MapPin } from 'lucide-react'
+import { Eye, EyeOff, User, Mail, MapPin } from 'lucide-react'
 import { registerUser, type RegisterResult } from '@/app/actions/register-actions'
 
 export default function CadastroPage() {
-  const totalSteps = 3
+  const router = useRouter()
   const [state, formAction, isPending] = useActionState(async (_prev: RegisterResult | null, formData: FormData) => {
     const res = await registerUser(formData)
     return res
   }, null as RegisterResult | null)
 
   const ok = state?.ok === true
+
+  // Redirecionar para login com mensagem de sucesso
+  useEffect(() => {
+    if (ok) {
+      const timer = setTimeout(() => {
+        router.push('/login?success=account-created')
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [ok, router])
 
   return (
     <div className="min-h-screen bg-amber-50 py-8 px-4">
@@ -27,7 +38,7 @@ export default function CadastroPage() {
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <form action={formAction} className="space-y-6">
-            {/* Passo 1 */}
+            {/* Dados Pessoais */}
             <div className="space-y-6">
               <div className="flex items-center space-x-2 mb-4">
                 <User className="w-5 h-5 text-amber-600" />
@@ -51,7 +62,7 @@ export default function CadastroPage() {
               </div>
             </div>
 
-            {/* Passo 2 */}
+            {/* Dados de Acesso */}
             <div className="space-y-6">
               <div className="flex items-center space-x-2 mb-4">
                 <Mail className="w-5 h-5 text-amber-600" />
@@ -70,7 +81,7 @@ export default function CadastroPage() {
               </div>
             </div>
 
-            {/* Passo 3 */}
+            {/* Endereço de Entrega */}
             <div className="space-y-6">
               <div className="flex items-center space-x-2 mb-4">
                 <MapPin className="w-5 h-5 text-amber-600" />
@@ -121,14 +132,33 @@ export default function CadastroPage() {
               </div>
             </div>
 
+            {/* Feedback Messages */}
             {state?.message && (
-              <p className={ok ? 'text-green-700' : 'text-red-600'}>{state.message}</p>
+              <div className={`p-4 rounded-xl ${
+                ok 
+                  ? 'bg-green-100 border border-green-300 text-green-700' 
+                  : 'bg-red-100 border border-red-300 text-red-700'
+              }`}>
+                <p className="font-medium">
+                  {ok ? '✓ ' : '⚠ '}
+                  {state.message}
+                </p>
+                {ok && (
+                  <p className="text-sm mt-1">Redirecionando para o login...</p>
+                )}
+              </div>
             )}
 
             <div className="flex justify-between pt-6">
-              <Link href="/" className="bg-amber-200 hover:bg-amber-300 text-amber-900 font-semibold py-3 px-6 rounded-xl inline-flex items-center">Já tem conta? Entrar</Link>
-              <Button type="submit" disabled={isPending} className="bg-yellow-500 hover:bg-yellow-600 text-amber-900 font-bold py-3 px-6 rounded-xl disabled:opacity-50">
-                {isPending ? 'Criando...' : (ok ? 'Conta criada!' : 'Criar Conta')}
+              <Link href="/" className="bg-amber-200 hover:bg-amber-300 text-amber-900 font-semibold py-3 px-6 rounded-xl inline-flex items-center">
+                Já tem conta? Entrar
+              </Link>
+              <Button 
+                type="submit" 
+                disabled={isPending || ok} 
+                className="bg-yellow-500 hover:bg-yellow-600 text-amber-900 font-bold py-3 px-6 rounded-xl disabled:opacity-50"
+              >
+                {isPending ? 'Criando...' : ok ? 'Conta criada! ✓' : 'Criar Conta'}
               </Button>
             </div>
           </form>
