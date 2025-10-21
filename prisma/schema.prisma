@@ -45,14 +45,15 @@ model Pizza {
   sabor       String   @unique
   descricao   String?
   precoBase   Decimal  @map("preco_base") @db.Decimal(10, 2)
+  imagem      String?  // ← ADICIONE ESTA LINHA
   
   criadoEm    DateTime @default(now()) @map("criado_em")
   
-  // Relação: uma pizza pode estar em vários itens de pedido
   itensPedido ItemPedido[]
 
   @@map("pizzas")
 }
+
 
 // Tabela de pedidos
 model Pedido {

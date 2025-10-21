@@ -11,7 +11,6 @@ export interface Product {
 
 export interface CartItem {
   id: string
-  tipo: "GRANDE" | "MÉDIA" | "1 litros" | "2 litros"
   nome: string
   imagem: string
   precoUnit: number

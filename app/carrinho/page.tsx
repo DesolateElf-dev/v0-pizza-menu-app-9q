@@ -73,7 +73,7 @@ export default function CarrinhoPage() {
       {/* Total Bar */}
       <div className="fixed bottom-20 left-0 right-0 mx-4">
         <div className="bg-amber-800 text-white px-6 py-4 rounded-2xl flex justify-between items-center">
-          <span className="font-semibold">Valor=</span>
+          <span className="font-semibold">Total:</span>
           <span className="font-bold text-lg">{formatPrice(total)}</span>
         </div>
       </div>

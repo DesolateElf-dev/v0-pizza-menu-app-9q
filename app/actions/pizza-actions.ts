@@ -1,5 +1,7 @@
 'use server'
 
+'use server'
+
 import { prisma } from '@/lib/db'
 
 export async function getPizzas() {
@@ -11,7 +13,14 @@ export async function getPizzas() {
     })
 
     console.log(`Carregadas ${pizzas.length} pizzas do banco`)
-    return pizzas
+
+    // Converter Decimal para number antes de retornar
+    const pizzasConvertidas = pizzas.map(pizza => ({
+      ...pizza,
+      precoBase: parseFloat(pizza.precoBase.toString()) // Converte Decimal para number
+    }))
+
+    return pizzasConvertidas
   } catch (error) {
     console.error('Erro ao carregar pizzas:', error)
     return []
@@ -24,20 +33,15 @@ export async function getPizzaById(id: string) {
       where: { id }
     })
 
-    return pizza
+    if (!pizza) return null
+
+    // Converter Decimal para number
+    return {
+      ...pizza,
+      precoBase: parseFloat(pizza.precoBase.toString())
+    }
   } catch (error) {
     console.error('Erro ao buscar pizza:', error)
     return null
   }
-}
-
-// Função para calcular preço por tamanho
-export function calcularPreco(precoBase: number, tamanho: string): number {
-  const multiplicadores = {
-    'Pequena': 0.8,   // 20% menor
-    'Média': 1.0,     // preço base
-    'Grande': 1.3     // 30% maior
-  }
-  
-  return precoBase * (multiplicadores[tamanho as keyof typeof multiplicadores] || 1.0)
 }

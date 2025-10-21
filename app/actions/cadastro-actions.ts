@@ -1,45 +1,43 @@
 'use server'
 
-import { prisma } from '@/lib/db'
-import bcrypt from 'bcrypt'
-import { redirect } from 'next/navigation'
+export async function getPizzas() {
+  try {
+    // Importação dinâmica para evitar problemas de cache
+    const { prisma } = await import('@/lib/db')
+    
+    console.log('Tentando carregar pizzas do banco...')
+    
+    const pizzas = await prisma.pizza.findMany({
+      orderBy: {
+        sabor: 'asc'
+      }
+    })
 
-export async function cadastrarCliente(formData: FormData) {
-  // Pegar os dados do formulário
-  const nome = formData.get('nome') as string
-  const cpf = formData.get('cpf') as string
-  const email = formData.get('email') as string
-  const senha = formData.get('senha') as string
-  const telefone = formData.get('telefone') as string || null
-  const rua = formData.get('rua') as string
-  const numero = formData.get('numero') as string
-  const complemento = formData.get('complemento') as string || null
-  const bairro = formData.get('bairro') as string
-  const cidade = formData.get('cidade') as string
-  const estado = formData.get('estado') as string
-  const cep = formData.get('cep') as string
+    console.log(`✅ Carregadas ${pizzas.length} pizzas do banco`)
+    return pizzas
+    
+  } catch (error) {
+    console.error('❌ Erro detalhado ao carregar pizzas:')
+    console.error('Tipo do erro:', typeof error)
+    console.error('Mensagem:', error instanceof Error ? error.message : String(error))
+    console.error('Stack:', error instanceof Error ? error.stack : 'Sem stack trace')
+    
+    // Retornar array vazio em caso de erro
+    return []
+  }
+}
 
-  // Fazer hash da senha (segurança)
-  const senhaHash = await bcrypt.hash(senha, 10)
+export async function getPizzaById(id: string) {
+  try {
+    const { prisma } = await import('@/lib/db')
+    
+    const pizza = await prisma.pizza.findUnique({
+      where: { id }
+    })
 
-  // Salvar no banco
-  await prisma.usuario.create({
-    data: {
-      nome,
-      cpf,
-      email,
-      senha: senhaHash,
-      telefone,
-      rua,
-      numero,
-      complemento,
-      bairro,
-      cidade,
-      estado,
-      cep,
-    },
-  })
-
-  // Redirecionar para página de sucesso
-  redirect('/cadastro/sucesso')
+    return pizza
+  } catch (error) {
+    console.error('Erro ao buscar pizza por ID:', error)
+    return null
+  }
 }
