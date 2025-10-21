@@ -2,65 +2,50 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Eye, EyeOff } from "lucide-react"
+import { authenticateUser } from "@/app/actions/login-actions"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState({
-    email: "",
-    senha: ""
-  })
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+  const [formData, setFormData] = useState({ email: "", senha: "" })
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-    
+    setError(null)
+    setLoading(true)
     try {
-      // Aqui você implementará a lógica de autenticação real
-      // Por agora, vamos simular um login bem-sucedido
-      console.log("Login:", formData)
-      
-      // Simular delay de autenticação
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Redirecionar para o menu após login bem-sucedido
-      router.push('/menu')
-    } catch (error) {
-      console.error('Erro no login:', error)
+      const fd = new FormData()
+      fd.set('email', formData.email)
+      fd.set('senha', formData.senha)
+      await authenticateUser(fd)
+    } catch (err: any) {
+      setError(err?.message || 'Falha ao autenticar')
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
+    setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
   return (
     <div className="min-h-screen bg-amber-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8">
-        {/* Logo/Header */}
         <div className="text-center">
           <h1 className="text-4xl font-bold text-amber-900 mb-2">🍕</h1>
-          <h2 className="text-2xl font-bold text-amber-900">Bem-vindo!</h2>
+          <h2 className="text-2xl font-bold text-amber-900">Bem-vindo de volta!</h2>
           <p className="text-amber-700 mt-2">Entre na sua conta para fazer pedidos</p>
         </div>
 
-        {/* Form */}
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-amber-900 mb-2">
-                E-mail
-              </label>
+              <label className="block text-sm font-medium text-amber-900 mb-2">E-mail</label>
               <Input
                 name="email"
                 type="email"
@@ -73,9 +58,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-amber-900 mb-2">
-                Senha
-              </label>
+              <label className="block text-sm font-medium text-amber-900 mb-2">Senha</label>
               <div className="relative">
                 <Input
                   name="senha"
@@ -91,53 +74,36 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-600 hover:text-amber-800"
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-amber-900 font-bold py-4 rounded-xl text-lg disabled:opacity-50"
-            >
-              {isLoading ? "Entrando..." : "Entrar"}
+            {error && <div className="text-red-600 text-sm">{error}</div>}
+
+            <Button type="submit" disabled={loading} className="w-full bg-yellow-500 hover:bg-yellow-600 text-amber-900 font-bold py-4 rounded-xl text-lg">
+              {loading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
 
-          {/* Divider */}
           <div className="mt-6 flex items-center justify-center">
             <div className="border-t border-amber-200 flex-1"></div>
             <span className="px-4 text-sm text-amber-600">ou</span>
             <div className="border-t border-amber-200 flex-1"></div>
           </div>
 
-          {/* Sign up link */}
           <div className="mt-6 text-center">
             <p className="text-amber-700">
               Não tem uma conta?{" "}
-              <Link
-                href="/cadastro"
-                className="font-semibold text-amber-900 hover:text-yellow-600 underline"
-              >
+              <Link href="/cadastro" className="font-semibold text-amber-900 hover:text-yellow-600 underline">
                 Criar conta
               </Link>
             </p>
           </div>
         </div>
 
-        {/* Guest access link */}
         <div className="text-center">
-          <Link
-            href="/menu"
-            className="text-amber-700 hover:text-amber-900 underline"
-          >
-            Continuar sem login →
-          </Link>
+          <Link href="/" className="text-amber-700 hover:text-amber-900 underline">← Voltar ao cardápio</Link>
         </div>
       </div>
     </div>
