@@ -32,11 +32,30 @@ export async function listUserOrders(params?: { status?: OrderStatus; from?: str
         status: true,
         valorTotal: true,
         itens: {
-          select: { id: true, quantidade: true, tamanho: true, pizza: { select: { sabor: true } } }
+          select: {
+            id: true,
+            quantidade: true,
+            // tamanho removido no novo schema
+            pizza: { select: { sabor: true, precoBase: true } },
+            pizzaDoce: { select: { sabor: true, precoBase: true } },
+            bebida: { select: { nome: true, preco: true } },
+          }
         }
       }
     })
   ])
 
-  return { items: pedidos, page, pageSize, total }
+  // Converter Decimals em numbers no retorno para evitar serialização de Decimal
+  const items = pedidos.map((p) => ({
+    ...p,
+    valorTotal: p.valorTotal ? Number(p.valorTotal) : null,
+    itens: p.itens.map((it) => ({
+      ...it,
+      pizza: it.pizza ? { ...it.pizza, precoBase: Number(it.pizza.precoBase) } : null,
+      pizzaDoce: it.pizzaDoce ? { ...it.pizzaDoce, precoBase: Number(it.pizzaDoce.precoBase) } : null,
+      bebida: it.bebida ? { ...it.bebida, preco: Number(it.bebida.preco) } : null,
+    }))
+  }))
+
+  return { items, page, pageSize, total }
 }
