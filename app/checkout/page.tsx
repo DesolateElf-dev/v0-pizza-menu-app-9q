@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import type React from "react"
 import { useState } from "react"
 import { Header } from "@/components/header"
@@ -9,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { useCart } from "@/app/context/cart-context"
+import { useCart } from "@/context/cart-context"
 import { formatPrice } from "@/lib/price"
 import { useRouter } from "next/navigation"
 import { criarPedido } from "@/app/actions/pedido-actions"
@@ -67,17 +69,12 @@ export default function CheckoutPage() {
         quantidade: item.quantidade,
       }))
 
-      console.log('📦 Enviando itens para o servidor:', itensPedido)
-      console.log('💰 Total do pedido:', total)
-
       const pedidoCriado = await criarPedido(session.email, itensPedido, total)
       const orderNum = pedidoCriado.id.slice(0, 6).toUpperCase()
       setOrderNumber(orderNum)
 
       clear()
       setShowSuccess(true)
-      
-      console.log('✅ Pedido criado com sucesso:', pedidoCriado.id)
       
     } catch (error) {
       console.error('❌ Erro ao processar pedido:', error)
@@ -122,7 +119,7 @@ export default function CheckoutPage() {
         {/* Resumo do pedido */}
         <div className="bg-amber-100 rounded-2xl p-4 space-y-2">
           <h3 className="font-bold text-amber-900">Resumo do pedido:</h3>
-          {items.map((item, index) => (
+          {items.map((item) => (
             <div key={`${item.type}-${item.id}`} className="flex justify-between text-sm text-amber-800">
               <span>{item.quantidade}x {item.nome}</span>
               <span>{formatPrice(item.subtotal)}</span>

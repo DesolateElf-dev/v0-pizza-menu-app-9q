@@ -7,6 +7,9 @@ import "./globals.css"
 import { CartProvider } from "@/context/cart-context"
 import { Suspense } from "react"
 
+// Força renderização dinâmica para evitar SSG de rotas com context client-side
+export const dynamic = "force-dynamic"
+
 export const metadata: Metadata = {
   title: "Pizzaria Mackenzie",
   description: "Delivery de pizzas, doces e bebidas",
