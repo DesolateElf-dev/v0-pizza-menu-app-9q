@@ -1,33 +1,45 @@
+::: mermaid
 flowchart LR
-  subgraph Browser [Cliente (React 19)]
-    A[/Menu (/menu)/]
-    B[/Checkout (/checkout)/]
-    C[/Pedidos (/pedidos)/]
-    Ctx[(CartProvider<br/>useCart)]
-    Card[Product/Pizza Card]
-  end
+    subgraph Cliente ["Cliente (React 19)"]
+        A[Menu /menu]
+        B[Checkout /checkout]
+        C[Pedidos /pedidos]
+        Ctx[CartProvider useCart]
+        Card[Product Card]
+    end
 
-  subgraph NextApp [Next.js (App Router)]
-    LA[app/layout.tsx<br/>CartProvider]
-    SA1[Server Action<br/>getPizzas/getPizzasDoces/getBebidas]
-    SA2[Server Action<br/>criarPedido]
-    SA3[Server Action<br/>getPedidos]
-    Prisma[Prisma Client]
-  end
+    subgraph NextJS ["Next.js App Router"]
+        LA[app/layout.tsx CartProvider]
+        SA1[getPizzas Server Action]
+        SA2[criarPedido Server Action]
+        SA3[getPedidos Server Action]
+        Prisma[Prisma Client]
+    end
 
-  subgraph DB [(PostgreSQL)]
-    T1[(Pizza)]
-    T2[(PizzaDoce)]
-    T3[(Bebida)]
-    T4[(Pedido)]
-    T5[(ItemPedido)]
-  end
+    subgraph Database ["PostgreSQL"]
+        T1[Pizza]
+        T2[PizzaDoce]
+        T3[Bebida]
+        T4[Pedido]
+        T5[ItemPedido]
+    end
 
-  A -->|listar/Adicionar| Ctx
-  Card -->|addItem(type,id,preco)| Ctx
-  A -->|SSR/SA| SA1 --> Prisma --> T1 & T2 & T3
+    A --> Ctx
+    Card --> Ctx
+    A --> SA1
+    SA1 --> Prisma
+    Prisma --> T1
+    Prisma --> T2
+    Prisma --> T3
 
-  B -->|Confirmar Pedido| SA2 --> Prisma --> T4 & T5
-  C -->|Histórico| SA3 --> Prisma --> T4 & T5
+    B --> SA2
+    SA2 --> Prisma
+    Prisma --> T4
+    Prisma --> T5
 
-  LA -.-> Ctx
+    C --> SA3
+    SA3 --> Prisma
+
+    LA -.-> Ctx
+
+:::

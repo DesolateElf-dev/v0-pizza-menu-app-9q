@@ -1,3 +1,4 @@
+::: mermaid
 sequenceDiagram
   participant U as Usuário
   participant Menu as /menu (Client)
@@ -23,3 +24,4 @@ sequenceDiagram
   DB-->>SA: OK
   SA-->>Checkout: Pedido criado
   Checkout-->>U: Confirmação
+:::

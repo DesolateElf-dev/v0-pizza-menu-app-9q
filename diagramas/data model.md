@@ -1,3 +1,4 @@
+::: mermaid
 erDiagram
   Pizza {
     String id PK
@@ -20,7 +21,7 @@ erDiagram
   Bebida {
     String id PK
     String nome
-    String volume // opcional (pode ser string)
+    String volume
     Decimal preco
     String imagem
     DateTime criadoEm
@@ -37,9 +38,9 @@ erDiagram
   ItemPedido {
     String id PK
     String pedidoId FK
-    String pizzaId  // nullable
-    String pizzaDoceId // nullable
-    String bebidaId // nullable
+    String pizzaId 
+    String pizzaDoceId
+    String bebidaId
     Int quantidade
   }
 
@@ -47,3 +48,4 @@ erDiagram
   Pizza ||--o{ ItemPedido : "ref por pizzaId"
   PizzaDoce ||--o{ ItemPedido : "ref por pizzaDoceId"
   Bebida ||--o{ ItemPedido : "ref por bebidaId"
+:::
