@@ -12,17 +12,28 @@ interface ItemCarrinho {
 
 export async function criarPedido(usuarioEmail: string, itens: ItemCarrinho[], valorTotal: number) {
   try {
+    // DEBUG: ver o que está chegando
+    console.log('📦 Itens recebidos na criarPedido:', JSON.stringify(itens, null, 2))
+    
     const usuario = await prisma.usuario.findUnique({ where: { email: usuarioEmail } })
     if (!usuario) throw new Error(`Usuário com email ${usuarioEmail} não encontrado`)
 
     const itensParaCriar = itens.map((item) => {
       const base: any = { quantidade: item.quantidade || 1 }
-      if (item.type === 'pizza') base.pizzaId = item.id
-      else if (item.type === 'pizzaDoce') base.pizzaDoceId = item.id
-      else if (item.type === 'bebida') base.bebidaId = item.id
-      else throw new Error(`Tipo de item inválido: ${item.type}`)
+      
+      // Se type não existir, tenta inferir pelo ID (fallback)
+      const tipo = item.type || 'pizza'
+      
+      console.log(`🔍 Processando item:`, { id: item.id, type: tipo, original: item.type })
+      
+      if (tipo === 'pizza') base.pizzaId = item.id
+      else if (tipo === 'pizzaDoce') base.pizzaDoceId = item.id
+      else if (tipo === 'bebida') base.bebidaId = item.id
+      else throw new Error(`Tipo de item inválido: ${tipo}`)
+      
       return base
     })
+
 
     const pedido = await prisma.pedido.create({
       data: {
