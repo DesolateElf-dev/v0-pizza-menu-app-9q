@@ -65,7 +65,7 @@ export default function CheckoutPage() {
       // Mapear itens do carrinho com o tipo correto
       const itensPedido = items.map((item) => ({
         id: item.id,
-        type: item.type,
+        type: item.type ?? "pizza",
         quantidade: item.quantidade,
       }))
 

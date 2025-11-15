@@ -2,9 +2,11 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+
 import type { Product } from "@/types"
 import { useCart } from "@/context/cart-context"
 import { formatPrice } from "@/lib/price"
+
 import Image from "next/image"
 
 interface PizzaCardProps {
@@ -15,48 +17,53 @@ export function PizzaCard({ product }: PizzaCardProps) {
   const { addItem } = useCart()
 
   const handleAddToCart = () => {
-    addItem(product) // Apenas isso, sem parâmetros de tamanho
+    console.log('Adicionar ao carrinho:', product)
+    addItem(product)
   }
 
+  const isBebida = product.categoria === "BEBIDAS"
+
   return (
-    <Card className="bg-amber-100 border-none shadow-md rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
-      <CardContent className="p-0">
-        <div className="relative h-32 bg-amber-200">
+    <Card className="relative flex flex-col p-4 space-y-3 rounded-2xl border border-amber-300 shadow-sm hover:shadow-md transition-shadow">
+      {product.imagem && (
+        <div className="relative w-full h-44">
           <Image
-            src={product.imagem || "/placeholder.svg"}
+            src={product.imagem}
             alt={product.nome}
             fill
-            className="object-cover"
-            sizes="(max-width: 768px) 50vw, 25vw"
+            className="object-contain rounded-xl"
+            sizes="(max-width: 640px) 100vw, 320px"
+            priority
           />
         </div>
+      )}
 
-        <div className="p-4 space-y-2">
-          <h3 className="font-bold text-sm text-amber-900">{product.nome}</h3>
-          <p className="text-xs text-amber-800 line-clamp-2">{product.descricao}</p>
+      <CardContent className="p-0">
+        <h3 className="text-lg font-semibold text-amber-900">{product.nome}</h3>
+        <p className="text-sm text-amber-700">{product.descricao}</p>
 
-          <div className="space-y-1 text-xs">
-            {product.categoria === "BEBIDAS" && product.tamanhos ? (
-              Object.entries(product.tamanhos).map(([size, price]) => (
-                <div key={size} className="text-yellow-600 font-semibold">
-                  {size} = {formatPrice(price)}
-                </div>
-              ))
-            ) : (
-              <>
-                <div className="text-yellow-600 font-semibold">GRANDE = {formatPrice(product.precoGrande)}</div>
-                <div className="text-yellow-600 font-semibold">MÉDIA = {formatPrice(product.precoMedia)}</div>
-              </>
-            )}
+        {isBebida && product.tamanhos ? (
+          <div className="mt-2 flex flex-col space-y-1 text-amber-800 font-semibold text-sm">
+            {Object.entries(product.tamanhos).map(([size, price]) => (
+              <span key={size}>
+                {size} = {formatPrice(price as number)}
+              </span>
+            ))}
           </div>
+        ) : (
+          <div className="mt-2 flex flex-col space-y-1 text-amber-800 font-semibold text-sm">
+            <span>GRANDE = {formatPrice(product.precoGrande ?? product.precoBase ?? 0)}</span>
+            <span>MÉDIA = {formatPrice(product.precoMedia ?? product.precoBase ?? 0)}</span>
+          </div>
+        )}
 
-          <Button
-            onClick={handleAddToCart}
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold text-xs py-2 rounded-lg transition-colors"
-          >
-            Adicionar
-          </Button>
-        </div>
+        <Button
+          className="mt-4 w-full"
+          onClick={handleAddToCart}
+          aria-label={`Adicionar ${product.nome} ao carrinho`}
+        >
+          Adicionar
+        </Button>
       </CardContent>
     </Card>
   )

@@ -6,14 +6,15 @@ import React, { createContext, useContext, useEffect, useReducer } from 'react'
 export type CartItemType = 'pizza' | 'pizzaDoce' | 'bebida'
 
 export interface CartItem {
-  id: string // id do produto (pizza/pizzaDoce/bebida)
-  type: CartItemType
+  id: string
   nome: string
   imagem?: string | null
   precoUnit: number
   quantidade: number
   subtotal: number
+  type?: "pizza" | "pizzaDoce" | "bebida"
 }
+
 
 interface CartState {
   items: CartItem[]
@@ -63,32 +64,52 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       const items = action.payload
       return { items, total: calcTotal(items) }
     }
-    case 'ADD_ITEM': {
-      const { id, type, nome, imagem, precoUnit } = action.payload
-      const key = itemKey(id, type)
-      const existingIndex = state.items.findIndex((it) => itemKey(it.id, it.type) === key)
+    case "ADD_ITEM": {
+      const product = action.payload
+
+      const itemId = product.id
+      const existingItem = state.items.find((item) => item.id === itemId)
+
+      // mapear categoria -> type usado no backend (criarPedido)
+      const type: "pizza" | "pizzaDoce" | "bebida" =
+        product.categoria === "PIZZAS"
+          ? "pizza"
+          : product.categoria === "PIZZAS_DOCE"
+            ? "pizzaDoce"
+            : "bebida"
 
       let newItems: CartItem[]
-      if (existingIndex >= 0) {
-        newItems = state.items.map((it, idx) =>
-          idx === existingIndex
-            ? { ...it, quantidade: it.quantidade + 1, subtotal: (it.quantidade + 1) * it.precoUnit }
-            : it
+
+      if (existingItem) {
+        newItems = state.items.map((item) =>
+          item.id === itemId
+            ? {
+                ...item,
+                quantidade: item.quantidade + 1,
+                subtotal: item.precoUnit * (item.quantidade + 1),
+              }
+            : item,
         )
       } else {
-        const next: CartItem = {
-          id,
-          type,
-          nome,
-          imagem: imagem ?? undefined,
-          precoUnit,
+        const price = product.precoMedia ?? product.precoBase ?? 0
+
+        const newItem: CartItem = {
+          id: itemId,
+          nome: product.nome,
+          imagem: product.imagem,
+          precoUnit: price,
           quantidade: 1,
-          subtotal: precoUnit,
-        }
-        newItems = [...state.items, next]
+          subtotal: price,
+          type, // ← NOVO: salva o tipo para o backend
+        } as CartItem
+
+        newItems = [...state.items, newItem]
       }
-      return { items: newItems, total: calcTotal(newItems) }
+
+      const total = newItems.reduce((sum, item) => sum + item.subtotal, 0)
+      return { items: newItems, total }
     }
+
     case 'UPDATE_QTY': {
       const { id, type, quantidade } = action.payload
       const key = itemKey(id, type)
