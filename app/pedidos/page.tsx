@@ -71,11 +71,14 @@ export default async function PedidosPage({ searchParams }: { searchParams: { st
                   </div>
                 </div>
                 <div className="mt-3 text-amber-800 text-sm">
-                  {p.itens.map((it) => (
-                    <div key={it.id} className="flex items-center justify-between py-1">
-                      <span>{it.quantidade}x {it.pizza.sabor} ({it.tamanho})</span>
-                    </div>
-                  ))}
+                  {p.itens.map((it: any) => {
+                    const label = it.pizza ? it.pizza.sabor : it.pizzaDoce ? it.pizzaDoce.sabor : it.bebida ? it.bebida.nome : 'Item'
+                    return (
+                      <div key={it.id} className="flex items-center justify-between py-1">
+                        <span>{it.quantidade}x {label}</span>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             ))}
