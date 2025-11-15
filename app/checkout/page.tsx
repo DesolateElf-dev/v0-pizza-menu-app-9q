@@ -65,15 +65,15 @@ export default function CheckoutPage() {
       // Mapear itens do carrinho com o tipo correto
       const itensPedido = items.map((item) => ({
         id: item.id,
-        type: item.type, // 'pizza' | 'pizzaDoce' | 'bebida'
+        type: item.type,
         quantidade: item.quantidade,
       }))
 
       const pedidoCriado = await criarPedido(session.email, itensPedido, total)
       const orderNum = pedidoCriado.id.slice(0, 6).toUpperCase()
+      
+      // Não limpar carrinho aqui! Só setar estados do modal
       setOrderNumber(orderNum)
-
-      clear()
       setShowSuccess(true)
       
     } catch (error) {
@@ -86,7 +86,8 @@ export default function CheckoutPage() {
 
   const handleSuccessClose = () => {
     setShowSuccess(false)
-    router.push("/menu")
+    clear() // Limpar carrinho só quando fechar o modal
+    router.push("/pedidos")
   }
 
   // Verificar se há itens no carrinho
@@ -224,22 +225,28 @@ export default function CheckoutPage() {
         </form>
       </div>
 
+      {/* Modal de sucesso */}
       <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
-        <DialogContent className="bg-amber-50 border-2 border-yellow-500 rounded-2xl">
+        <DialogContent className="bg-amber-50 border-2 border-yellow-500 rounded-2xl max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-center text-amber-900 text-xl font-bold">Pedido Recebido!</DialogTitle>
+            <DialogTitle className="text-center text-amber-900 text-xl font-bold">
+              Pedido Recebido!
+            </DialogTitle>
           </DialogHeader>
-          <div className="text-center py-4">
-            <div className="text-4xl mb-4">✅</div>
-            <p className="text-amber-800 mb-4">Seu pedido foi confirmado com sucesso!</p>
-            <p className="text-lg font-semibold text-amber-900">Número do pedido: #{orderNumber}</p>
-            <p className="text-sm text-amber-700 mt-2">Você pode acompanhar o status na seção de pedidos</p>
+          <div className="text-center py-4 space-y-4">
+            <div className="text-6xl">✅</div>
+            <p className="text-amber-800 text-lg">Seu pedido foi confirmado com sucesso!</p>
+            <div className="bg-yellow-100 border-2 border-yellow-400 rounded-xl p-4">
+              <p className="text-sm text-amber-700 mb-1">Número do pedido:</p>
+              <p className="text-2xl font-bold text-amber-900">#{orderNumber}</p>
+            </div>
+            <p className="text-sm text-amber-600">Você pode acompanhar o status na seção de pedidos</p>
           </div>
           <Button 
             onClick={handleSuccessClose} 
             className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-2xl"
           >
-            Continuar
+            Ver meus pedidos
           </Button>
         </DialogContent>
       </Dialog>
