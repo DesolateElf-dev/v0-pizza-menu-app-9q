@@ -50,7 +50,7 @@ export function Header({ showBackButton }: HeaderProps) {
           </button>
         )}
         <Link href="/menu">
-          <h1 className="text-xl font-bold hover:text-amber-200 transition-colors cursor-pointer">Pizzaria Mackenzie</h1>
+          <h1 className="text-xl font-bold hover:text-amber-200 transition-colors cursor-pointer">Pizzaria Mackenzie iteracao2</h1>
         </Link>
       </div>
 
