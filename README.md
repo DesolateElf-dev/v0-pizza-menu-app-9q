@@ -4,6 +4,12 @@ Aplicação web de cardápio e pedidos de uma pizzaria, construída com **Next.j
 Permite visualizar o cardápio (pizzas salgadas, pizzas doces e bebidas), adicionar itens ao carrinho e finalizar pedidos. [web:49][web:50]
 
 ---
+## Membros do Grupo:
+- Amany Serhan - 10403229
+- Gabriel Barros - 10400300
+- Benny Machado - 10424035
+- Eduardo Sanchez - 10415259
+- Vitor Batista Souza - 10424618
 
 ## Tecnologias utilizadas
 
@@ -135,44 +141,42 @@ text
 
 A estrutura pode variar, mas em linhas gerais: [web:49][web:50]
 
-.
-├── app/
-│ ├── layout.tsx # Layout raiz
-│ ├── page.tsx # Página inicial
-│ ├── menu/page.tsx # Página do cardápio
-│ ├── carrinho/page.tsx # Página do carrinho
-│ ├── checkout/page.tsx # Página de checkout
-│ └── actions/
-│ ├── pizza-actions.ts # Ações server-side para pizzas
-│ └── pedido-actions.ts # Ações server-side para pedidos
-│
-├── components/
-│ ├── header.tsx # Cabeçalho da aplicação
-│ ├── pizza-card.tsx # Componente de card para itens do cardápio
-│ └── ui/ # Componentes UI (botões, inputs etc.)
-│
-├── context/
-│ └── cart-context.tsx # Contexto global do carrinho
-│
-├── prisma/
-│ ├── schema.prisma # Definição do modelo de dados
-│ └── seed.ts # Script de seed do banco
-│
-├── public/
-│ └── images/
-│ ├── pizzas/ # Imagens de pizzas salgadas
-│ ├── pizzas-doces/ # Imagens de pizzas doces
-│ └── bebidas/ # Imagens de bebidas
-│
-├── lib/
-│ ├── db.ts # Configuração do Prisma Client
-│ └── price.ts # Função utilitária de formatação de preços
-│
-├── package.json
-├── pnpm-lock.yaml
-└── README.md
 
-text
+├── app/  
+│ ├── layout.tsx # Layout raiz  
+│ ├── page.tsx # Página inicial  
+│ ├── menu/page.tsx # Página do cardápio  
+│ ├── carrinho/page.tsx # Página do carrinho  
+│ ├── checkout/page.tsx # Página de checkout  
+│ └── actions/  
+│ ├── pizza-actions.ts # Ações server-side para pizzas  
+│ └── pedido-actions.ts # Ações server-side para pedidos  
+│  
+├── components/  
+│ ├── header.tsx # Cabeçalho da aplicação  
+│ ├── pizza-card.tsx # Componente de card para itens do cardápio  
+│ └── ui/ # Componentes UI (botões, inputs etc.)  
+│  
+├── context/  
+│ └── cart-context.tsx # Contexto global do carrinho  
+│  
+├── prisma/  
+│ ├── schema.prisma # Definição do modelo de dados  
+│ └── seed.ts # Script de seed do banco  
+│  
+├── public/  
+│ └── images/  
+│ ├── pizzas/ # Imagens de pizzas salgadas  
+│ ├── pizzas-doces/ # Imagens de pizzas doces  
+│ └── bebidas/ # Imagens de bebidas  
+│  
+├── lib/  
+│ ├── db.ts # Configuração do Prisma Client  
+│ └── price.ts # Função utilitária de formatação de preços  
+│  
+├── package.json  
+├── pnpm-lock.yaml  
+└── README.md  
 
 ---
 
